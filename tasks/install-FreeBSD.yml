@@ -1,0 +1,6 @@
+---
+
+- name: Install postfix
+  pkgng:
+    name: postfix
+    state: present

@@ -1,0 +1,8 @@
+postfix_user: postfix
+postfix_group: postfix
+postfix_log_dir: /var/log/postfix
+postfix_db_dir: "{{ __postfix_db_dir }}"
+postfix_service: postfix
+postfix_conf_dir: "{{ __postfix_conf_dir }}"
+postfix_conf_file: "{{ __postfix_conf_dir }}/postfix.conf"
+postfix_flags: ""

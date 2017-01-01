@@ -1,0 +1,37 @@
+---
+# tasks file for ansible-role-postfix
+
+- include_vars: "{{ ansible_os_family }}.yml"
+
+- include: "install-{{ ansible_os_family }}.yml"
+
+- name: Create log directory
+  file:
+    path: "{{ postfix_log_dir }}"
+    mode: 0755
+    owner: "{{ postfix_user }}"
+    group: "{{ postfix_group }}"
+    state: directory
+  notify: Restart postfix
+
+- name: Create db directory
+  file:
+    path: "{{ postfix_db_dir }}"
+    mode: 0755
+    owner: "{{ postfix_user }}"
+    group: "{{ postfix_group }}"
+    state: directory
+  notify: Restart postfix
+
+- name: Create postfix.conf
+  template:
+    src: postfix.conf.j2
+    dest: "{{ postfix_conf_file }}"
+    validate: echo %s
+  notify: Restart postfix
+
+- name: Start postfix
+  service:
+    name: "{{ postfix_service }}"
+    enabled: true
+    state: started

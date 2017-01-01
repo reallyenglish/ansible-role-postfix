@@ -1,0 +1,2 @@
+__postfix_db_dir: /var/db/postfix
+__postfix_conf_dir: /usr/local/etc/postfix

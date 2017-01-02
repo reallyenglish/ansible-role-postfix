@@ -38,3 +38,4 @@ postfix_master_cf:
 postfix_main_cf_default:
   soft_bounce: "yes"
 postfix_main_cf: {}
+postfix_tables: []

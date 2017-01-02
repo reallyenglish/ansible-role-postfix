@@ -22,6 +22,67 @@ None
 | `postfix_master_cf` | array of lines of `master.cf` | See below |
 | `postfix_main_cf_default` | dict of defaults in `main.cf` | `{"soft_bounce"=>"yes"}` |
 | `postfix_main_cf` | dict of `main.cf` | `{}` |
+| `postfix_tables` | See below | `[]` |
+
+## `postfix_master_cf`
+
+```yaml
+postfix_master_cf:
+  - "# service type  private unpriv  chroot  wakeup  maxproc command + args"
+  - smtp      inet  n       -       n       -       -       smtpd
+  - pickup    unix  n       -       n       60      1       pickup
+  - cleanup   unix  n       -       n       -       0       cleanup
+  - qmgr      unix  n       -       n       300     1       qmgr
+  - tlsmgr    unix  -       -       n       1000?   1       tlsmgr
+  - rewrite   unix  -       -       n       -       -       trivial-rewrite
+  - bounce    unix  -       -       n       -       0       bounce
+  - defer     unix  -       -       n       -       0       bounce
+  - trace     unix  -       -       n       -       0       bounce
+  - verify    unix  -       -       n       -       1       verify
+  - flush     unix  n       -       n       1000?   0       flush
+  - proxymap  unix  -       -       n       -       -       proxymap
+  - proxywrite unix -       -       n       -       1       proxymap
+  - smtp      unix  -       -       n       -       -       smtp
+  - relay     unix  -       -       n       -       -       smtp
+  - showq     unix  n       -       n       -       -       showq
+  - error     unix  -       -       n       -       -       error
+  - retry     unix  -       -       n       -       -       error
+  - discard   unix  -       -       n       -       -       discard
+  - local     unix  -       n       n       -       -       local
+  - virtual   unix  -       n       n       -       -       virtual
+  - lmtp      unix  -       -       n       -       -       lmtp
+  - anvil     unix  -       -       n       -       1       anvil
+  - scache    unix  -       -       n       -       1       scache
+```
+## `postfix_tables`
+
+`postfix_tables` holds a list of lookup tables. An element of the list is a
+dict, whose keys and values are described below.
+
+| key | description |
+|-----|-------------|
+| `type` | lookup table type, such as `hash`, `cidr`, or `pcre` |
+| `name` | the file name, which must be in the form of `$NAME.$type`. |
+| `table` | the table |
+
+Tables defined in `postfix_tables` are created in `postfix_db_dir`, and
+automatically `postmap(1)`ed. When any of the tables is updated, `postfix` is
+reloaded by a handler.
+
+```yaml
+postfix_tables:
+  - name: mynetworks.cidr
+    type: cidr
+    table:
+      127.0.0.1:
+      192.168.100.0/24:
+      192.168.101.0/24:
+  - name: hello_access.hash
+    type: hash
+    table:
+      localhost: reject
+      localhost.localdomain: reject
+```
 
 ## FreeBSD
 
@@ -43,6 +104,18 @@ None
   roles:
     - ansible-role-postfix
   vars:
+    postfix_tables:
+      - name: mynetworks.cidr
+        type: cidr
+        table:
+          127.0.0.1:
+          192.168.100.0/24:
+          192.168.101.0/24:
+      - name: hello_access.hash
+        type: hash
+        table:
+          localhost: reject
+          localhost.localdomain: reject
 ```
 
 # License

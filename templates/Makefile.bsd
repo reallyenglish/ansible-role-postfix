@@ -1,9 +1,0 @@
-MAPS+=	
-
-all: ${MAPS} /etc/mail/aliases.db
-
-/etc/mail/aliases.db: /etc/mail/aliases
-	newaliases
-
-%.db: %
-	postmap $*

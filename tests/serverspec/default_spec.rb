@@ -85,3 +85,25 @@ ports.each do |p|
     it { should be_listening }
   end
 end
+
+describe file("#{ db_dir }/mynetworks.cidr") do
+  it { should be_file }
+  its(:content) { should match(/^#{ Regexp.escape("127.0.0.1") }\s*$/) }
+  its(:content) { should match(/^#{ Regexp.escape("192.168.100.0/24") }\s*$/) }
+  its(:content) { should match(/^#{ Regexp.escape("192.168.101.0/24") }\s*$/) }
+end
+
+describe file("#{ db_dir }/hello_access.hash") do
+  it { should be_file }
+  its(:content) { should match(/^localhost\s+reject$/) }
+end
+
+describe file("#{ db_dir }/hello_access.hash.db") do
+  it { should be_file }
+end
+
+describe command("postmap -q localhost #{ db_dir }/hello_access.hash") do
+  its(:exit_status) { should eq 0 }
+  its(:stdout) { should match(/^reject$/) }
+  its(:stderr) { should match(/^$/) }
+end

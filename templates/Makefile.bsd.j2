@@ -1,9 +1,10 @@
 HASHES_DB=	${HASHES:=.db}
-all:	${HASHES_DB} /etc/mail/aliases.db
+{% set _alias_maps = register_alias_maps.stdout %}
+all:	${HASHES_DB} {{ _alias_maps }}.db
 
 .SUFFIXES: .db
 
-/etc/aliases.db: /etc/mail/aliases
+{{ _alias_maps }}.db: {{ _alias_maps }}
 	newaliases
 
 ${HASHES_DB}: ${.PREFIX}

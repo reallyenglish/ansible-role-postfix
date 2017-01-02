@@ -14,6 +14,27 @@
     mode: 0755
     state: directory
 
+- name: Create master.cf
+  template:
+    src: master.cf.j2
+    dest: "{{ postfix_master_cf_path }}"
+    # XXX `%s` must be here, although `postfix check` does not need it,
+    # ansible template module does.
+    validate: postfix check %s
+  notify: Restart postfix
+
+- name: Create main.cf
+  template:
+    src: main.cf.j2
+    dest: "{{ postfix_main_cf_path }}"
+    validate: postfix check %s
+  notify: Reload postfix
+
+- name: Register alias_maps
+  shell: "postconf -pxh alias_maps | cut -f 2 -d:"
+  register: register_alias_maps
+  changed_when: false
+
 - name: Create BSD Makefile to postmap databases
   template:
     src: Makefile.bsd.j2
@@ -47,22 +68,6 @@
   shell: "make -C {{ postfix_db_dir }} HASHES='{{ postfix_text_databases | join(' ')  }}'"
   register: register_make_postmap
   changed_when: register_make_postmap.stdout | length > 0
-  notify: Reload postfix
-
-- name: Create master.cf
-  template:
-    src: master.cf.j2
-    dest: "{{ postfix_master_cf_path }}"
-    # XXX `%s` must be here, although `postfix check` does not need it,
-    # ansible template module does.
-    validate: postfix check %s
-  notify: Restart postfix
-
-- name: Create main.cf
-  template:
-    src: main.cf.j2
-    dest: "{{ postfix_main_cf_path }}"
-    validate: postfix check %s
   notify: Reload postfix
 
 - name: Start postfix

@@ -2,5 +2,10 @@
 
 - name: Restart postfix
   service:
-    name: postfix
+    name: "{{ postfix_service }}"
     state: restarted
+
+- name: Reload postfix
+  service:
+    name: "{{ postfix_service }}"
+    state: reloaded

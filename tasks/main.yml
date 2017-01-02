@@ -16,23 +16,44 @@
 
 - name: Create BSD Makefile to postmap databases
   template:
-    src: Makefile.bsd
+    src: Makefile.bsd.j2
     dest: "{{ postfix_db_dir }}/Makefile"
     validate: make -f %s
   when: ansible_os_family == 'FreeBSD' or ansible_os_family == 'OpenBSD'
 
 - name: Create GNU Makefile to postmap databases
   template:
-    src: Makefile.gmake
+    src: Makefile.gmake.j2
     dest: "{{ postfix_db_dir }}/Makefile"
     validate: make -f %s
   when: ansible_os_family == 'Debian' or ansible_os_family == 'RedHat'
+
+- name: Create lookup table files
+  template:
+    src: table.j2
+    dest: "{{ postfix_db_dir }}/{{ item.name }}"
+  register: register_table
+  # TODO create a wrapper script to validate file-based database files
+  # validate: postmap_validate -t {{ item.value.type }} %s
+  with_items: "{{ postfix_tables  }}"
+  notify: Reload postfix
+
+- set_fact:
+    # extract file name that needs to be postmap(8)ed from `postfix_tables`
+    postfix_text_databases: "{{ postfix_tables | selectattr('type', 'match', '^(btree|cdb|dbm|hash|lmdb|sdbm)$') | map(attribute='name') | list }}"
+
+
+- name: Run postmap(1) on changed files by Makefile
+  shell: "make -C {{ postfix_db_dir }} HASHES='{{ postfix_text_databases | join(' ')  }}'"
+  register: register_make_postmap
+  changed_when: register_make_postmap.stdout | length > 0
+  notify: Reload postfix
 
 - name: Create master.cf
   template:
     src: master.cf.j2
     dest: "{{ postfix_master_cf_path }}"
-    # XXX `%s` must be here, although `postfix check` does not need it, but
+    # XXX `%s` must be here, although `postfix check` does not need it,
     # ansible template module does.
     validate: postfix check %s
   notify: Restart postfix

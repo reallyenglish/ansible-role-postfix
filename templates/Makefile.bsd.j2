@@ -1,0 +1,10 @@
+HASHES_DB=	${HASHES:=.db}
+all:	${HASHES_DB} /etc/mail/aliases.db
+
+.SUFFIXES: .db
+
+/etc/aliases.db: /etc/mail/aliases
+	newaliases
+
+${HASHES_DB}: ${.PREFIX}
+	postmap ${.PREFIX:C/^.*\.//}:${.PREFIX}

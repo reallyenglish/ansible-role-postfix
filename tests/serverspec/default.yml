@@ -2,3 +2,15 @@
   roles:
     - ansible-role-postfix
   vars:
+    postfix_tables:
+      - name: mynetworks.cidr
+        type: cidr
+        table:
+          127.0.0.1:
+          192.168.100.0/24:
+          192.168.101.0/24:
+      - name: hello_access.hash
+        type: hash
+        table:
+          localhost: reject
+          localhost.localdomain: reject

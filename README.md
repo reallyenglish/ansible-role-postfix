@@ -1,6 +1,6 @@
 # ansible-role-postfix
 
-A brief description of the role goes here.
+Configures postfix.
 
 # Requirements
 
@@ -8,9 +8,29 @@ None
 
 # Role Variables
 
-| variable | description | default |
+| Variable | Description | Default |
 |----------|-------------|---------|
+| `postfix_user` | user name of postfix | `{{ __postfix_user }}` |
+| `postfix_group` | group name of postfix | `{{ __postfix_group }}` |
+| `postfix_service` | service name | `postfix` |
+| `postfix_conf_dir` | path to configuration directory | `{{ __postfix_conf_dir }}` |
+| `postfix_db_dir` | path to the directory where table files reside | `{{ postfix_conf_dir }}/db` |
+| `postfix_master_cf_path` | path to `master.cf` | `{{ __postfix_conf_dir }}/master.cf` |
+| `postfix_main_cf_path` | path to `main.cf` | `{{ __postfix_conf_dir }}/main.cf` |
+| `postfix_flags` | NOT implemented | `""` |
+| `postfix_package` | package name of postfix | `{{ __postfix_package }}` |
+| `postfix_master_cf` | array of lines of `master.cf` | See below |
+| `postfix_main_cf_default` | dict of defaults in `main.cf` | `{"soft_bounce"=>"yes"}` |
+| `postfix_main_cf` | dict of `main.cf` | `{}` |
 
+## FreeBSD
+
+| Variable | Default |
+|----------|---------|
+| `__postfix_user` | `postfix` |
+| `__postfix_group` | `postfix` |
+| `__postfix_conf_dir` | `/usr/local/etc/postfix` |
+| `__postfix_package` | `mail/postfix` |
 
 # Dependencies
 
@@ -19,6 +39,10 @@ None
 # Example Playbook
 
 ```yaml
+- hosts: localhost
+  roles:
+    - ansible-role-postfix
+  vars:
 ```
 
 # License

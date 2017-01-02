@@ -2,5 +2,39 @@
 
 - name: Install postfix
   pkgng:
-    name: postfix
+    name: "{{ postfix_package }}"
     state: present
+
+- name: See if mailer.conf is updated
+  command: diff /etc/mail/mailer.conf /usr/local/share/postfix/mailer.conf.postfix
+  register: register_diff_mailer_conf
+  changed_when: false
+
+- name: Install mailer.conf
+  command: install -m 0644 /usr/local/share/postfix/mailer.conf.postfix /etc/mail/mailer.conf
+  when: register_diff_mailer_conf.rc != 0
+
+- name: Stop sendmail
+  service:
+    name: sendmail
+    state: stopped
+
+- name: See if sendmail_enable is NONE
+  command: sysrc -n sendmail_enable
+  register: register_sysrc_sendmail
+  changed_when: false
+
+- name: Disable sendmail
+  command: 'sysrc sendmail_enable="NONE"'
+  when: "not 'NONE' in register_sysrc_sendmail.stdout_lines"
+
+- name: Enable postfix
+  service:
+    name: "{{ postfix_service }}"
+    enabled: yes
+
+# TODO periodic
+# daily_clean_hoststat_enable="NO"
+# daily_status_mail_rejects_enable="NO"
+# daily_status_include_submit_mailq="NO"
+# daily_submit_queuerun="NO"

@@ -2,4 +2,3 @@
   roles:
     - ansible-role-postfix
   vars:
-    postfix_config: ""

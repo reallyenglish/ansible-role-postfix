@@ -1,50 +1,79 @@
-require 'spec_helper'
-require 'serverspec'
+require "spec_helper"
+require "serverspec"
 
-package = 'postfix'
-service = 'postfix'
-config  = '/etc/postfix/postfix.conf'
-user    = 'postfix'
-group   = 'postfix'
-ports   = [ PORTS ]
-log_dir = '/var/log/postfix'
-db_dir  = '/var/lib/postfix'
+package = "postfix"
+service = "postfix"
+conf_dir = "/etc/postfix"
+ports   = [ 25 ]
 
 case os[:family]
-when 'freebsd'
-  config = '/usr/local/etc/postfix.conf'
-  db_dir = '/var/db/postfix'
+when "freebsd"
+  conf_dir = "/usr/local/etc/postfix"
 end
+
+db_dir  = "#{ conf_dir }/db"
+main_cf  = "#{ conf_dir }/main.cf"
+master_cf = "#{ conf_dir }/master.cf"
 
 describe package(package) do
   it { should be_installed }
 end 
 
-describe file(config) do
-  it { should be_file }
-  its(:content) { should match Regexp.escape('postfix') }
+case os[:family]
+when "freebsd"
+  describe file("/etc/mail/mailer.conf") do
+    it { should be_file }
+    it { should be_mode 644 }
+  end
+
+  describe command("diff /etc/mail/mailer.conf /usr/local/share/postfix/mailer.conf.postfix") do
+    its(:exit_status) { should eq 0 }
+    its(:stdout) { should match(/^$/) }
+    its(:stderr) { should match(/^$/) }
+  end
+
+  describe command("sysrc -n sendmail_enable") do
+    its(:exit_status) { should eq 0 }
+    its(:stdout) { should match(/^NONE$/) }
+    its(:stderr) { should match(/^$/) }
+  end
 end
 
-describe file(log_dir) do
-  it { should exist }
-  it { should be_mode 755 }
-  it { should be_owned_by user }
-  it { should be_grouped_into group }
+describe file(main_cf) do
+  it { should be_file }
+  its(:content) { should match(/^soft_bounce = yes$/) }
+end
+
+describe file(master_cf) do
+  it { should be_file }
+  its(:content) { should match(/^smtp\s+inet\s+n\s+-\s+n\s+-\s+-\s+smtpd$/) }
 end
 
 describe file(db_dir) do
   it { should exist }
+  it { should be_directory }
   it { should be_mode 755 }
-  it { should be_owned_by user }
-  it { should be_grouped_into group }
 end
 
+describe file("#{ db_dir }/Makefile") do
+  it { should exist }
+  it { should be_file }
+end
+
+describe command("make -C #{db_dir} -n") do
+  its(:exit_status) { should eq 0 }
+    its(:stdout) { should match(/^$/) }
+    its(:stderr) { should match(/^$/) }
+end
+
+=begin
 case os[:family]
-when 'freebsd'
-  describe file('/etc/rc.conf.d/postfix') do
+when "freebsd"
+  describe file("/etc/rc.conf.d/postfix") do
     it { should be_file }
   end
 end
+=end
 
 describe service(service) do
   it { should be_running }

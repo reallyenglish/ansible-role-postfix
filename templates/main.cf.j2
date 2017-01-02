@@ -1,0 +1,3 @@
+{% for k, v in postfix_main_cf_merged | dictsort %}
+{{ k }} = {{ v }}
+{% endfor %}

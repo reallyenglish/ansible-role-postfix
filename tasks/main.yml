@@ -3,35 +3,48 @@
 
 - include_vars: "{{ ansible_os_family }}.yml"
 
+- set_fact:
+    postfix_main_cf_merged: "{{ postfix_main_cf_default | combine(postfix_main_cf, recursive = True) }}"
+
 - include: "install-{{ ansible_os_family }}.yml"
 
-- name: Create log directory
-  file:
-    path: "{{ postfix_log_dir }}"
-    mode: 0755
-    owner: "{{ postfix_user }}"
-    group: "{{ postfix_group }}"
-    state: directory
-  notify: Restart postfix
-
-- name: Create db directory
+- name: Create database directory
   file:
     path: "{{ postfix_db_dir }}"
     mode: 0755
-    owner: "{{ postfix_user }}"
-    group: "{{ postfix_group }}"
     state: directory
+
+- name: Create BSD Makefile to postmap databases
+  template:
+    src: Makefile.bsd
+    dest: "{{ postfix_db_dir }}/Makefile"
+    validate: make -f %s
+  when: ansible_os_family == 'FreeBSD' or ansible_os_family == 'OpenBSD'
+
+- name: Create GNU Makefile to postmap databases
+  template:
+    src: Makefile.gmake
+    dest: "{{ postfix_db_dir }}/Makefile"
+    validate: make -f %s
+  when: ansible_os_family == 'Debian' or ansible_os_family == 'RedHat'
+
+- name: Create master.cf
+  template:
+    src: master.cf.j2
+    dest: "{{ postfix_master_cf_path }}"
+    # XXX `%s` must be here, although `postfix check` does not need it, but
+    # ansible template module does.
+    validate: postfix check %s
   notify: Restart postfix
 
-- name: Create postfix.conf
+- name: Create main.cf
   template:
-    src: postfix.conf.j2
-    dest: "{{ postfix_conf_file }}"
-    validate: echo %s
-  notify: Restart postfix
+    src: main.cf.j2
+    dest: "{{ postfix_main_cf_path }}"
+    validate: postfix check %s
+  notify: Reload postfix
 
 - name: Start postfix
   service:
     name: "{{ postfix_service }}"
-    enabled: true
     state: started

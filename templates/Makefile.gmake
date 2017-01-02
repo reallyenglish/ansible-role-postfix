@@ -1,0 +1,8 @@
+MAPS = 
+all: $(MAPS)
+
+aliases.db : aliases
+	newaliases
+
+%.db : %
+	postmap $*

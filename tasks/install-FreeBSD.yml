@@ -8,11 +8,12 @@
 - name: See if mailer.conf is updated
   command: diff /etc/mail/mailer.conf /usr/local/share/postfix/mailer.conf.postfix
   register: register_diff_mailer_conf
+  failed_when: register_diff_mailer_conf.rc == 2
   changed_when: false
 
 - name: Install mailer.conf
   command: install -m 0644 /usr/local/share/postfix/mailer.conf.postfix /etc/mail/mailer.conf
-  when: register_diff_mailer_conf.rc != 0
+  when: register_diff_mailer_conf.rc == 1
 
 - name: Stop sendmail
   service:

@@ -1,0 +1,32 @@
+---
+
+- name: Configure debconf to disable automatic configurations
+  debconf:
+    name: postfix
+    question: postfix/main_mailer_type
+    value: No configuration
+    vtype: select
+
+- name: Install postfix
+  apt:
+    name: "{{ postfix_package }}"
+    state: present
+
+- name: Enable postfix
+  service:
+    name: "{{ postfix_service }}"
+    enabled: yes
+
+- name: See if main.cf exist
+  stat:
+    path: "{{ postfix_main_cf_path }}"
+  register: register_main_cf_stat
+  changed_when: false
+
+- name: Create empty main.cf if it does not exist
+  # because, in tasks/main.yml, alias_maps is retrieved by postconf and
+  # postconf expects main.cf to exist
+  file:
+    path: "{{ postfix_main_cf_path }}"
+    state: touch
+  when: not register_main_cf_stat.stat.exists

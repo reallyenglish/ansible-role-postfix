@@ -1,0 +1,4 @@
+__postfix_user: postfix
+__postfix_group: postfix
+__postfix_conf_dir: /etc/postfix
+__postfix_package: postfix

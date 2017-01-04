@@ -5,10 +5,12 @@ package = "postfix"
 service = "postfix"
 conf_dir = "/etc/postfix"
 ports   = [ 25 ]
+extra_make_flag = "--no-print-directory"
 
 case os[:family]
 when "freebsd"
   conf_dir = "/usr/local/etc/postfix"
+  extra_make_flag = ""
 end
 
 db_dir  = "#{ conf_dir }/db"
@@ -60,9 +62,9 @@ describe file("#{ db_dir }/Makefile") do
   it { should be_file }
 end
 
-describe command("make -C #{db_dir} -n") do
+describe command("make -C #{db_dir} -n #{ extra_make_flag }") do
   its(:exit_status) { should eq 0 }
-    its(:stdout) { should match(/^$/) }
+  its(:stdout) { should match(/^(?::)?$/) } # gmake prints commands starting with "@" even when given -n
     its(:stderr) { should match(/^$/) }
 end
 

@@ -11,6 +11,8 @@ case os[:family]
 when "freebsd"
   conf_dir = "/usr/local/etc/postfix"
   extra_make_flag = ""
+when "openbsd"
+  extra_make_flag = ""
 end
 
 db_dir  = "#{ conf_dir }/db"

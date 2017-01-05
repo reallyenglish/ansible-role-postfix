@@ -1,0 +1,22 @@
+---
+
+- name: Install postfix
+  openbsd_pkg:
+    name: "{{ postfix_package }}"
+    state: present
+
+- name: Create /etc/mailer.conf
+  command: /usr/local/sbin/postfix-enable
+  args:
+    creates: /etc/mailer.conf.pre-postfix
+
+- name: Stop smtpd
+  service:
+    name: smtpd
+    state: stopped
+    enabled: false
+
+- name: Enable postfix
+  service:
+    name: "{{ postfix_service }}"
+    enabled: yes

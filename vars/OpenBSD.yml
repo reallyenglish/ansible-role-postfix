@@ -1,0 +1,9 @@
+__postfix_user: _postfix
+__postfix_group: _postfix
+__postfix_conf_dir: /etc/postfix
+#__postfix_package: postfix--%stable
+# use versioned package name for now
+#
+# openbsd_pkg: Add support for "pkgname%branch" syntax. Fixes #97 #2508
+# https://github.com/ansible/ansible-modules-extras/pull/2508
+__postfix_package: postfix-3.1.1p0

@@ -84,6 +84,15 @@ postfix_tables:
       localhost.localdomain: reject
 ```
 
+## Debian
+
+| Variable | Default |
+|----------|---------|
+| `__postfix_user` | `postfix` |
+| `__postfix_group` | `postfix` |
+| `__postfix_conf_dir` | `/etc/postfix` |
+| `__postfix_package` | `postfix` |
+
 ## FreeBSD
 
 | Variable | Default |
@@ -92,6 +101,24 @@ postfix_tables:
 | `__postfix_group` | `postfix` |
 | `__postfix_conf_dir` | `/usr/local/etc/postfix` |
 | `__postfix_package` | `mail/postfix` |
+
+## OpenBSD
+
+| Variable | Default |
+|----------|---------|
+| `__postfix_user` | `_postfix` |
+| `__postfix_group` | `_postfix` |
+| `__postfix_conf_dir` | `/etc/postfix` |
+| `__postfix_package` | `postfix-3.1.1p0` |
+
+## RedHat
+
+| Variable | Default |
+|----------|---------|
+| `__postfix_user` | `postfix` |
+| `__postfix_group` | `postfix` |
+| `__postfix_conf_dir` | `/etc/postfix` |
+| `__postfix_package` | `postfix` |
 
 # Dependencies
 

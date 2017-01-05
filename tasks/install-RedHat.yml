@@ -1,0 +1,11 @@
+---
+
+- name: Install postfix
+  yum:
+    name: "{{ postfix_package }}"
+    state: present
+
+- name: Enable postfix
+  service:
+    name: "{{ postfix_service }}"
+    enabled: yes

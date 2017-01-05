@@ -84,6 +84,15 @@ postfix_tables:
       localhost.localdomain: reject
 ```
 
+## Debian
+
+| Variable | Default |
+|----------|---------|
+| `__postfix_user` | `postfix` |
+| `__postfix_group` | `postfix` |
+| `__postfix_conf_dir` | `/etc/postfix` |
+| `__postfix_package` | `postfix` |
+
 ## FreeBSD
 
 | Variable | Default |
@@ -92,6 +101,24 @@ postfix_tables:
 | `__postfix_group` | `postfix` |
 | `__postfix_conf_dir` | `/usr/local/etc/postfix` |
 | `__postfix_package` | `mail/postfix` |
+
+## OpenBSD
+
+| Variable | Default |
+|----------|---------|
+| `__postfix_user` | `_postfix` |
+| `__postfix_group` | `_postfix` |
+| `__postfix_conf_dir` | `/etc/postfix` |
+| `__postfix_package` | `postfix-3.1.1p0` |
+
+## RedHat
+
+| Variable | Default |
+|----------|---------|
+| `__postfix_user` | `postfix` |
+| `__postfix_group` | `postfix` |
+| `__postfix_conf_dir` | `/etc/postfix` |
+| `__postfix_package` | `postfix` |
 
 # Dependencies
 
@@ -116,6 +143,32 @@ None
         table:
           localhost: reject
           localhost.localdomain: reject
+    postfix_main_cf: "{% if ansible_os_family == 'OpenBSD' %}{{ postfix_main_cf_openbsd }}{% else %}{}{% endif %}"
+
+    # unlike other distributions, the OpenBSD package does not modify
+    # /etc/postfix/main.cf.default, but sets distribution defaults in
+    # /etc/postfix/main.cf. An empty main.cf does not work.
+    postfix_main_cf_openbsd:
+      compatibility_level: 2
+      smtputf8_enable: "no"
+      queue_directory: /var/spool/postfix
+      command_directory: /usr/local/sbin
+      daemon_directory: /usr/local/libexec/postfix
+      data_directory: /var/postfix
+      mail_owner: "{{ postfix_user }}"
+      inet_protocols: all
+      unknown_local_recipient_reject_code: 550
+      debug_peer_level: 2
+      sendmail_path: /usr/local/sbin/sendmail
+      newaliases_path: /usr/local/sbin/newaliases
+      mailq_path: /usr/local/sbin/mailq
+      setgid_group: _postdrop
+      html_directory: /usr/local/share/doc/postfix/html
+      manpage_directory: /usr/local/man
+      sample_directory: /etc/postfix
+      readme_directory: /usr/local/share/doc/postfix/readme
+      meta_directory: /etc/postfix
+      shlib_directory: "no"
 ```
 
 # License

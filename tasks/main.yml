@@ -18,16 +18,12 @@
   template:
     src: master.cf.j2
     dest: "{{ postfix_master_cf_path }}"
-    # XXX `%s` must be here, although `postfix check` does not need it,
-    # ansible template module does.
-    validate: postfix check %s
   notify: Restart postfix
 
 - name: Create main.cf
   template:
     src: main.cf.j2
     dest: "{{ postfix_main_cf_path }}"
-    validate: postfix check %s
   notify: Reload postfix
 
 - name: Register alias_maps

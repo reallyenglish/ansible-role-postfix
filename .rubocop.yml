@@ -2,6 +2,7 @@ inherit_from: .rubocop_todo.yml
 
 AllCops:
   Exclude:
+    - "tests/integration/example/**/*" # TODO remove me when https://github.com/reallyenglish/ansible-role-postfix/tree/issue_4 is merged
     - "vendor/**/*"
     - "tests/integration/**/roles/*"
     # ignore these until rubocop is incorportaed into qansible

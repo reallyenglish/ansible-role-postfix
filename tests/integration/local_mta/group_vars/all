@@ -1,0 +1,2 @@
+postfix_main_cf:
+  mynetworks: 192.168.21.100/24

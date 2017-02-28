@@ -6,13 +6,18 @@ service = "postfix"
 conf_dir = "/etc/postfix"
 ports   = [ 25 ]
 extra_make_flag = "--no-print-directory"
+default_user = "root"
+default_group = "root"
 
 case os[:family]
 when "freebsd"
   conf_dir = "/usr/local/etc/postfix"
   extra_make_flag = ""
+  default_group = "wheel"
 when "openbsd"
   extra_make_flag = ""
+  default_group = "wheel"
+when "openbsd"
 end
 
 db_dir  = "#{ conf_dir }/db"
@@ -40,6 +45,21 @@ when "freebsd"
     its(:exit_status) { should eq 0 }
     its(:stdout) { should match(/^NONE$/) }
     its(:stderr) { should match(/^$/) }
+  end
+
+  describe file("/etc/periodic.conf") do
+    it { should be_file }
+    it { should be_owned_by default_user }
+    it { should be_grouped_into default_group }
+    its(:content) { should match(/^daily_clean_hoststat_enable="NO"$/) }
+    its(:content) { should match(/^daily_status_mail_rejects_enable="NO"$/) }
+    its(:content) { should match(/^daily_status_include_submit_mailq="NO"$/) }
+    its(:content) { should match(/^daily_submit_queuerun="NO"$/) }
+
+    its(:content) { should_not match(/^daily_clean_hoststat_enable="YES"$/) }
+    its(:content) { should_not match(/^daily_status_mail_rejects_enable="YES"$/) }
+    its(:content) { should_not match(/^daily_status_include_submit_mailq="YES"$/) }
+    its(:content) { should_not match(/^daily_submit_queuerun="YES"$/) }
   end
 end
 

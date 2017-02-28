@@ -79,6 +79,18 @@
   changed_when: register_make_postmap.stdout | length > 0
   notify: Reload postfix
 
+- name: Validate all configurations
+  command: postfix check
+  register: register_postfix_check
+  changed_when: false
+  failed_when: false
+
+- name: Assert postfix check is successful, if not, show friendly message
+  assert:
+    msg: "`postfix check` failed. postfix has not been reloaded but some configurations might have be read by postfix. Run `postfix check`, find out error, fix it and deploy again"
+    that:
+      - register_postfix_check.rc == 0
+
 - name: Start postfix
   service:
     name: "{{ postfix_service }}"

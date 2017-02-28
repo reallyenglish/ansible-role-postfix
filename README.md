@@ -2,6 +2,15 @@
 
 Configures postfix.
 
+## Notes about validating configurations
+
+The role checks all the configurations right before `postfix reload`. However,
+as `postfix check` requires all configurations, including `main.cf`,
+`master.cf`, and various tables, and postfix daemons read configuration files
+and table periodically, it is not possible to validate them without affecting
+running postfix. If the validation fails, the ansible play will stops. But do
+not assume that your changes has not been deployed.
+
 # Requirements
 
 None

@@ -34,7 +34,7 @@ context "after provisioning finished" do
     describe "maillog" do
       it "logs local(8) delivered to mailbox" do
         result = current_server.ssh_exec("sudo cat /var/log/maillog | grep 'postfix\/local'")
-        expect(result).to match(%r{/postfix/local\[\d+\]: [0-9A-Z]+: to=<vagrant@server1\.virtualbox\.reallyenglish\.com>, relay=local, .* status=sent \(delivered to mailbox\)$})
+        expect(result).to match(%r{postfix/local\[\d+\]: [0-9A-Z]+: to=<vagrant@server1\.virtualbox\.reallyenglish\.com>, relay=local, .* status=sent \(delivered to mailbox\)$})
       end
     end
   end

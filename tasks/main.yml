@@ -87,7 +87,7 @@
 
 - name: Assert postfix check is successful, if not, show friendly message
   assert:
-    msg: "`postfix check` failed. postfix has not been reloaded but some configurations might have be read by postfix. Run `postfix check`, find out error, fix it and deploy again"
+    msg: "`postfix check` failed. postfix has not been reloaded but some configurations might have been read by postfix. Run `postfix check`, find out error, fix it and deploy again"
     that:
       - register_postfix_check.rc == 0
 

@@ -1,5 +1,10 @@
 ---
 
+- name: Install gmake
+  yum:
+    name: make
+    state: present
+
 - name: Install postfix
   yum:
     name: "{{ postfix_package }}"

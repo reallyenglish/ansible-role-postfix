@@ -50,23 +50,26 @@ def fetch(uri_str, limit = 10)
   end
 end
 
-def retry_and_sleep(options = {}, &block)
+def retry_and_sleep(options = {})
   opts = {
-    :tries => 60,
-    :sec => 10,
-    :on => [ Exception ],
-    :verbose => false
+    tries: 60,
+    sec: 10,
+    on: [Exception],
+    verbose: false
   }.merge(options)
-  tries, sec, on, verbose = opts[:tries], opts[:sec], opts[:on], opts[:verbose]
+  tries = opts[:tries]
+  sec = opts[:sec]
+  on = opts[:on]
+  verbose = opts[:verbose]
   i = 1
   begin
     yield
   rescue *on => e
-    warn "rescue an excpetion %s" % [ e.class ] if verbose
+    warn "rescue an excpetion %s" % [e.class] if verbose
     warn e.message if verbose
     if (tries -= 1) > 0
-      warn "retrying (remaining: %d)" % [ tries ]
-      warn "sleeping %d sec" % [ sec ] if verbose
+      warn "retrying (remaining: %d)" % [tries]
+      warn "sleeping %d sec" % [sec] if verbose
       sleep sec
       i += 1
       retry
@@ -76,7 +79,6 @@ end
 
 require 'shellwords'
 class Vagrant
-
   def initialize
     @status # Process::Status
     @out
@@ -102,8 +104,8 @@ class Vagrant
   def execute(command, opt, server)
     begin
       command = "vagrant #{Shellwords.escape(command)}" + ' '
-      command += "#{Shellwords.escape(opt)}" + ' ' if not opt.empty?
-      command += "#{Shellwords.escape(server)}"
+      command += Shellwords.escape(opt).to_s + ' ' unless opt.empty?
+      command += Shellwords.escape(server).to_s
       @out, @err, @status = Open3.capture3(command)
     rescue SystemCallError => e
       @status = e
@@ -111,9 +113,7 @@ class Vagrant
     status
   end
 
-  def status
-    @status
-  end
+  attr_reader :status
 
   def stdout
     @out
@@ -131,12 +131,10 @@ class Vagrant
     @err.split("\n").to_a
   end
 
-  def status
-    @status
-  end
+  attr_reader :status
 
   def success?
-    return  false if @success.nil?
+    return false if @success.nil?
     return false if @status.is_a?(Exception)
     @status.success?
   end

@@ -37,7 +37,7 @@
 - name: Remove sendmail-specific tasks with YES
   lineinfile:
     dest: /etc/periodic.conf
-    regexp: '^{{ item }}="?[Yy]Ee][Ss]"?'
+    regexp: '^{{ item }}="?[Yy][Ee][Ss]"?'
     create: yes
     state: absent
     validate: sh -n %s

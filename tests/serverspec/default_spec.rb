@@ -6,13 +6,17 @@ service = "postfix"
 conf_dir = "/etc/postfix"
 ports = [25]
 extra_make_flag = "--no-print-directory"
+default_user = "root"
+default_group = "root"
 
 case os[:family]
 when "freebsd"
   conf_dir = "/usr/local/etc/postfix"
   extra_make_flag = ""
+  default_group = "wheel"
 when "openbsd"
   extra_make_flag = ""
+  default_group = "wheel"
 end
 
 db_dir = "#{conf_dir}/db"
@@ -27,6 +31,8 @@ case os[:family]
 when "freebsd"
   describe file("/etc/mail/mailer.conf") do
     it { should be_file }
+    it { should be_owned_by default_user }
+    it { should be_grouped_into default_group }
     it { should be_mode 644 }
   end
 
@@ -41,27 +47,54 @@ when "freebsd"
     its(:stdout) { should match(/^NONE$/) }
     its(:stderr) { should match(/^$/) }
   end
+
+  describe file("/etc/periodic.conf") do
+    it { should be_file }
+    it { should be_owned_by default_user }
+    it { should be_grouped_into default_group }
+    it { should be_mode 644 }
+    its(:content) { should match(/^daily_clean_hoststat_enable="NO"$/) }
+    its(:content) { should match(/^daily_status_mail_rejects_enable="NO"$/) }
+    its(:content) { should match(/^daily_status_include_submit_mailq="NO"$/) }
+    its(:content) { should match(/^daily_submit_queuerun="NO"$/) }
+
+    its(:content) { should_not match(/^daily_clean_hoststat_enable="YES"$/) }
+    its(:content) { should_not match(/^daily_status_mail_rejects_enable="YES"$/) }
+    its(:content) { should_not match(/^daily_status_include_submit_mailq="YES"$/) }
+    its(:content) { should_not match(/^daily_submit_queuerun="YES"$/) }
+  end
 end
 
 describe file(main_cf) do
   it { should be_file }
+  it { should be_owned_by default_user }
+  it { should be_grouped_into default_group }
+  it { should be_mode 644 }
   its(:content) { should match(/^soft_bounce = yes$/) }
 end
 
 describe file(master_cf) do
   it { should be_file }
+  it { should be_owned_by default_user }
+  it { should be_grouped_into default_group }
+  it { should be_mode 644 }
   its(:content) { should match(/^smtp\s+inet\s+n\s+-\s+n\s+-\s+-\s+smtpd$/) }
 end
 
 describe file(db_dir) do
   it { should exist }
   it { should be_directory }
+  it { should be_owned_by default_user }
+  it { should be_grouped_into default_group }
   it { should be_mode 755 }
 end
 
 describe file("#{db_dir}/Makefile") do
   it { should exist }
   it { should be_file }
+  it { should be_owned_by default_user }
+  it { should be_mode 644 }
+  it { should be_grouped_into default_group }
 end
 
 describe command("make -C #{db_dir} -n #{extra_make_flag}") do
@@ -90,6 +123,9 @@ end
 
 describe file("#{db_dir}/mynetworks.cidr") do
   it { should be_file }
+  it { should be_owned_by default_user }
+  it { should be_grouped_into default_group }
+  it { should be_mode 644 }
   its(:content) { should match(/^#{ Regexp.escape("127.0.0.1") }\s*$/) }
   its(:content) { should match(/^#{ Regexp.escape("192.168.100.0/24") }\s*$/) }
   its(:content) { should match(/^#{ Regexp.escape("192.168.101.0/24") }\s*$/) }
@@ -97,11 +133,17 @@ end
 
 describe file("#{db_dir}/hello_access.hash") do
   it { should be_file }
+  it { should be_owned_by default_user }
+  it { should be_grouped_into default_group }
+  it { should be_mode 644 }
   its(:content) { should match(/^localhost\s+reject$/) }
 end
 
 describe file("#{db_dir}/hello_access.hash.db") do
   it { should be_file }
+  it { should be_owned_by default_user }
+  it { should be_grouped_into default_group }
+  it { should be_mode 644 }
 end
 
 describe command("postmap -q localhost #{db_dir}/hello_access.hash") do

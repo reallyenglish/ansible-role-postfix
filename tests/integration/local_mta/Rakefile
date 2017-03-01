@@ -10,7 +10,7 @@ required_roles = %w(
 )
 
 def fetch(uri_str, limit = 10)
-  raise ArgumentError, 'too many HTTP redirects' if limit == 0
+  raise ArgumentError, 'too many HTTP redirects' if limit.zero?
   response = Net::HTTP.get_response(URI(uri_str))
   case response
   when Net::HTTPSuccess then

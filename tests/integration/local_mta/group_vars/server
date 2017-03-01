@@ -1,0 +1,3 @@
+postfix_main_cf:
+  mydestination: $myhostname localhost.$mydomain localhost
+  mynetworks_style: subnet

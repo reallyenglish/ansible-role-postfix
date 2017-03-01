@@ -1,0 +1,3 @@
+postfix_main_cf:
+  myorigin: client1.virtualbox.reallyenglish.com
+  relayhost: 192.168.21.200

@@ -34,6 +34,7 @@ None
 | `postfix_group` | group name of postfix | `{{ __postfix_group }}` |
 | `postfix_service` | service name | `postfix` |
 | `postfix_conf_dir` | path to configuration directory | `{{ __postfix_conf_dir }}` |
+| `postfix_aliases_file` | path to `aliases(5)` | `{{ __postfix_aliases_file }}` |
 | `postfix_db_dir` | path to the directory where table files reside | `{{ postfix_conf_dir }}/db` |
 | `postfix_master_cf_path` | path to `master.cf` | `{{ __postfix_conf_dir }}/master.cf` |
 | `postfix_main_cf_path` | path to `main.cf` | `{{ __postfix_conf_dir }}/main.cf` |
@@ -43,6 +44,8 @@ None
 | `postfix_main_cf_default` | dict of defaults in `main.cf` | `{"soft_bounce"=>"yes"}` |
 | `postfix_main_cf` | dict of `main.cf` | `{}` |
 | `postfix_tables` | See below | `[]` |
+| `postfix_aliases` | dict of additional aliases | `{}` |
+| `postfix_aliases_default` | dict of default aliases | `{{ __postfix_aliases_default }}` |
 
 ## `postfix_master_cf`
 

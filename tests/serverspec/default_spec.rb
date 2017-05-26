@@ -80,9 +80,6 @@ describe file(aliases_file) do
   it { should be_grouped_into default_group }
   it { should be_mode 644 }
   its(:content) { should match(/^dave\.null:\s+root$/) }
-  case os[:family]
-  when "freebsd"
-  end
   aliases_default_hash.each do |k, v|
     its(:content) { should match(/^#{Regexp.escape(k)}:\s+#{Regexp.escape(v)}$/) }
   end

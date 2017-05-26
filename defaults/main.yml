@@ -2,6 +2,7 @@ postfix_user: "{{ __postfix_user }}"
 postfix_group: "{{ __postfix_group }}"
 postfix_service: postfix
 postfix_conf_dir: "{{ __postfix_conf_dir }}"
+postfix_aliases_file: "{{ __postfix_aliases_file }}"
 postfix_db_dir: "{{ postfix_conf_dir }}/db"
 postfix_master_cf_path: "{{ __postfix_conf_dir }}/master.cf"
 postfix_main_cf_path: "{{ __postfix_conf_dir }}/main.cf"
@@ -39,3 +40,5 @@ postfix_main_cf_default:
   soft_bounce: "yes"
 postfix_main_cf: {}
 postfix_tables: []
+postfix_aliases: {}
+postfix_aliases_default: "{{ __postfix_aliases_default }}"

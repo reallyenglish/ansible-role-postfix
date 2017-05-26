@@ -1,10 +1,6 @@
 HASHES_DB = $(HASHES:=.db)
-{% set _alias_maps = register_alias_maps.stdout %}
 all : $(HASHES_DB)
 	@:
-
-{{ _alias_maps }}.db: {{ _alias_maps }}
-	newaliases
 
 $(HASHES_DB): $*
 	postmap $(subst .,,$(suffix $*)):$*

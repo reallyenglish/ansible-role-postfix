@@ -6,6 +6,24 @@
 - set_fact:
     postfix_main_cf_merged: "{{ postfix_main_cf_default | combine(postfix_main_cf, recursive = True) }}"
 
+- set_fact:
+    postfix_aliases_merged: "{{ postfix_aliases_default[ansible_distribution_version] | combine(postfix_aliases) }}"
+  when:
+    - ansible_os_family != 'OpenBSD'
+    - ansible_os_family != 'RedHat'
+
+- set_fact:
+  # XXX this is a bug in ansible, which says ansible_distribution_version ==
+  # "release" while ansible_distribution_release == "6.0"
+    postfix_aliases_merged: "{{ postfix_aliases_default[ansible_distribution_release] | combine(postfix_aliases) }}"
+  when:
+    - ansible_os_family == 'OpenBSD'
+
+- set_fact:
+    postfix_aliases_merged: "{{ postfix_aliases_default[ansible_distribution_major_version] | combine(postfix_aliases) }}"
+  when:
+    - ansible_os_family == 'RedHat'
+
 - include: "install-{{ ansible_os_family }}.yml"
 
 - name: Create database directory
@@ -25,6 +43,30 @@
     src: main.cf.j2
     dest: "{{ postfix_main_cf_path }}"
   notify: Reload postfix
+
+- name: Create aliases(5)
+  template:
+    src: aliases.j2
+    dest: "{{ postfix_aliases_file }}"
+    backup: yes
+  register: register_postfix_aliases_file
+
+- name: Stat aliases(5)
+  stat:
+    path: "{{ postfix_aliases_file }}"
+  register: register_postfix_aliases_file_st
+
+- name: Stat aliases.db
+  stat:
+    path: "{{ postfix_aliases_file }}.db"
+  register: register_postfix_aliases_db_st
+
+- name: Update aliases(5)
+  command: newaliases
+  when:
+    # translation: update aliases.db does not exist or aliases is newer than
+    # aliases.db
+    - register_postfix_aliases_db_st.stat.exists == false or (register_postfix_aliases_file_st.stat.mtime > register_postfix_aliases_db_st.stat.mtime)
 
 - name: Register alias_maps
   shell: "postconf -pxh alias_maps | cut -f 2 -d:"

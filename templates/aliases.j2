@@ -1,0 +1,4 @@
+# Managed by ansible
+{% for k, v in postfix_aliases_merged | dictsort %}
+{{ k }}: {{ v }}
+{% endfor %}

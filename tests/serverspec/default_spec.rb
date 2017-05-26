@@ -6,6 +6,8 @@ service = "postfix"
 conf_dir = "/etc/postfix"
 ports = [25]
 extra_make_flag = "--no-print-directory"
+aliases_file = "/etc/aliases"
+aliases_default_hash = { "postmaster" => "root" }
 default_user = "root"
 default_group = "root"
 
@@ -14,9 +16,16 @@ when "freebsd"
   conf_dir = "/usr/local/etc/postfix"
   extra_make_flag = ""
   default_group = "wheel"
+  aliases_file = "/etc/mail/aliases"
+  aliases_default_hash = { "MAILER-DAEMON" => "postmaster", "_dhcp" => "root",
+                           "auditdistd" => "root", "hast" => "root" }
 when "openbsd"
   extra_make_flag = ""
   default_group = "wheel"
+  aliases_file = "/etc/mail/aliases"
+  aliases_default_hash = { "MAILER-DAEMON" => "postmaster", "_dhcp" => "/dev/null", "_bgpd" => "/dev/null" }
+when "redhat"
+  aliases_default_hash = { "mailer-daemon" => "postmaster", "ftpadmin" => "ftp", "ftp-adm" => "ftp", "marketing" => "postmaster" }
 end
 
 db_dir = "#{conf_dir}/db"
@@ -65,12 +74,41 @@ when "freebsd"
   end
 end
 
+describe file(aliases_file) do
+  it { should be_file }
+  it { should be_owned_by default_user }
+  it { should be_grouped_into default_group }
+  it { should be_mode 644 }
+  its(:content) { should match(/^dave\.null:\s+root$/) }
+  case os[:family]
+  when "freebsd"
+  end
+  aliases_default_hash.each do |k, v|
+    its(:content) { should match(/^#{Regexp.escape(k)}:\s+#{Regexp.escape(v)}$/) }
+  end
+end
+
+aliases_default_hash.each do |k, v|
+  describe command("postmap -q #{k} #{aliases_file}") do
+    its(:exit_status) { should eq 0 }
+    its(:stdout) { should match(/^#{Regexp.escape(v)}$/) }
+    its(:stderr) { should eq "" }
+  end
+end
+
+describe command("postmap -q dave.null #{aliases_file}") do
+  its(:exit_status) { should eq 0 }
+  its(:stdout) { should match(/^root$/) }
+  its(:stderr) { should eq "" }
+end
+
 describe file(main_cf) do
   it { should be_file }
   it { should be_owned_by default_user }
   it { should be_grouped_into default_group }
   it { should be_mode 644 }
   its(:content) { should match(/^soft_bounce = yes$/) }
+  its(:content) { should match(/^alias_database = #{Regexp.escape(aliases_file)}$/) } if os[:family] == "freebsd"
 end
 
 describe file(master_cf) do

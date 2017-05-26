@@ -2,6 +2,11 @@
 
 Configures postfix.
 
+Please make sure your platform and its version is supported in `meta/main.yml`.
+The role is designed to be version-agnostic, but, to keep compatibility with
+default installation, it maintains a list of aliases in default `aliases(5)`
+(see `var/*.yml`).
+
 ## Notes about validating configurations
 
 The role checks all the configurations right before `postfix reload`. However,
@@ -10,6 +15,12 @@ as `postfix check` requires all configurations, including `main.cf`,
 and table periodically, it is not possible to validate them without affecting
 running postfix. If the validation fails, the ansible play will stop. But do
 not assume that your changes have not been deployed.
+
+## Notes for FreeBSD
+
+Always set `alias_database` to the *real* path to `aliases(5)` in `main.cf(5)`.
+Do not rely on symlinks. The role assume the path is `/etc/mail/aliases` by
+default.
 
 # Requirements
 
@@ -101,6 +112,18 @@ postfix_tables:
 | `__postfix_group` | `postfix` |
 | `__postfix_conf_dir` | `/etc/postfix` |
 | `__postfix_package` | `postfix` |
+| `__postfix_aliases_file` | `/etc/aliases` |
+| `__postfix_aliases_default` | see below |
+
+### `__postfix_aliases_default`
+
+```yaml
+__postfix_aliases_default:
+  "14.04":
+    postmaster: root
+  "16.04":
+    postmaster: root
+```
 
 ## FreeBSD
 
@@ -110,7 +133,44 @@ postfix_tables:
 | `__postfix_group` | `postfix` |
 | `__postfix_conf_dir` | `/usr/local/etc/postfix` |
 | `__postfix_package` | `mail/postfix` |
+| `__postfix_aliases_file` | `/etc/mail/aliases` |
+| `__postfix_aliases_default` | see below |
 
+### `__postfix_aliases_default`
+
+```yaml
+__postfix_aliases_default:
+  "10.3":
+    MAILER-DAEMON: postmaster
+    postmaster: root
+    _dhcp: root
+    _pflogd: root
+    auditdistd: root
+    bin: root
+    bind: root
+    daemon: root
+    games: root
+    hast: root
+    kmem: root
+    mailnull: postmaster
+    man: root
+    news: root
+    nobody: root
+    operator: root
+    pop: root
+    proxy: root
+    smmsp: postmaster
+    sshd: root
+    system: root
+    toor: root
+    tty: root
+    usenet: news
+    uucp: root
+    abuse: root
+    security: root
+    ftp: root
+    ftp-bugs: ftp
+```
 ## OpenBSD
 
 | Variable | Default |
@@ -119,6 +179,79 @@ postfix_tables:
 | `__postfix_group` | `_postfix` |
 | `__postfix_conf_dir` | `/etc/postfix` |
 | `__postfix_package` | `postfix-3.1.1p0` |
+| `__postfix_aliases_file` | `/etc/mail/aliases` |
+| `__postfix_aliases_default` | see below |
+
+### `__postfix_aliases_default`
+
+```yaml
+__postfix_aliases_default:
+  "6.0":
+    MAILER-DAEMON: postmaster
+    postmaster: root
+    daemon: root
+    ftp-bugs: root
+    operator: root
+    uucp: root
+    www: root
+    _bgpd: /dev/null
+    _dhcp: /dev/null
+    _dpb: /dev/null
+    _dvmrpd: /dev/null
+    _eigrpd: /dev/null
+    _file: /dev/null
+    _fingerd: /dev/null
+    _ftp: /dev/null
+    _hostapd: /dev/null
+    _identd: /dev/null
+    _iked: /dev/null
+    _isakmpd: /dev/null
+    _iscsid: /dev/null
+    _ldapd: /dev/null
+    _ldpd: /dev/null
+    _mopd: /dev/null
+    _nsd: /dev/null
+    _ntp: /dev/null
+    _ospfd: /dev/null
+    _ospf6d: /dev/null
+    _pbuild: /dev/null
+    _pfetch: /dev/null
+    _pflogd: /dev/null
+    _pkgfetch: /dev/null
+    _pkguntar: /dev/null
+    _portmap: /dev/null
+    _ppp: /dev/null
+    _radiusd: /dev/null
+    _rbootd: /dev/null
+    _relayd: /dev/null
+    _rebound: /dev/null
+    _ripd: /dev/null
+    _rstatd: /dev/null
+    _rtadvd: /dev/null
+    _rusersd: /dev/null
+    _rwalld: /dev/null
+    _smtpd: /dev/null
+    _smtpq: /dev/null
+    _sndio: /dev/null
+    _snmpd: /dev/null
+    _spamd: /dev/null
+    _syslogd: /dev/null
+    _tcpdump: /dev/null
+    _tftpd: /dev/null
+    _unbound: /dev/null
+    _vmd: /dev/null
+    _x11: /dev/null
+    _ypldap: /dev/null
+    bin: /dev/null
+    nobody: /dev/null
+    proxy: /dev/null
+    _tftp_proxy: /dev/null
+    _ftp_proxy: /dev/null
+    _sndiop: /dev/null
+    sshd: /dev/null
+    abuse: root
+    security: root
+```
 
 ## RedHat
 
@@ -128,6 +261,91 @@ postfix_tables:
 | `__postfix_group` | `postfix` |
 | `__postfix_conf_dir` | `/etc/postfix` |
 | `__postfix_package` | `postfix` |
+| `__postfix_aliases_file` | `/etc/aliases` |
+| `__postfix_aliases_default` | see below |
+
+### `__postfix_aliases_default`
+
+```yaml
+__postfix_aliases_default:
+  "7":
+    mailer-daemon: postmaster
+    postmaster: root
+    bin: root
+    daemon: root
+    adm: root
+    lp: root
+    sync: root
+    shutdown: root
+    halt: root
+    mail: root
+    news: root
+    uucp: root
+    operator: root
+    games: root
+    gopher: root
+    ftp: root
+    nobody: root
+    radiusd: root
+    nut: root
+    dbus: root
+    vcsa: root
+    canna: root
+    wnn: root
+    rpm: root
+    nscd: root
+    pcap: root
+    apache: root
+    webalizer: root
+    dovecot: root
+    fax: root
+    quagga: root
+    radvd: root
+    pvm: root
+    amandabackup: root
+    privoxy: root
+    ident: root
+    named: root
+    xfs: root
+    gdm: root
+    mailnull: root
+    postgres: root
+    sshd: root
+    smmsp: root
+    postfix: root
+    netdump: root
+    ldap: root
+    squid: root
+    ntp: root
+    mysql: root
+    desktop: root
+    rpcuser: root
+    rpc: root
+    nfsnobody: root
+    ingres: root
+    system: root
+    toor: root
+    manager: root
+    dumper: root
+    abuse: root
+    newsadm: news
+    newsadmin: news
+    usenet: news
+    ftpadm: ftp
+    ftpadmin: ftp
+    ftp-adm: ftp
+    ftp-admin: ftp
+    www: webmaster
+    webmaster: root
+    noc: root
+    security: root
+    hostmaster: root
+    info: postmaster
+    marketing: postmaster
+    sales: postmaster
+    support: postmaster
+    decode: root
+```
 
 # Dependencies
 
@@ -140,6 +358,8 @@ None
   roles:
     - ansible-role-postfix
   vars:
+    postfix_aliases:
+      dave.null: root
     postfix_tables:
       - name: mynetworks.cidr
         type: cidr
@@ -152,7 +372,14 @@ None
         table:
           localhost: reject
           localhost.localdomain: reject
-    postfix_main_cf: "{% if ansible_os_family == 'OpenBSD' %}{{ postfix_main_cf_openbsd }}{% else %}{}{% endif %}"
+    postfix_main_cf: "{% if ansible_os_family == 'OpenBSD' %}{{ postfix_main_cf_openbsd }}{% elif ansible_os_family == 'FreeBSD' %}{{ postfix_main_cf_freebsd }}{% else %}{}{% endif %}"
+
+    # for historical reasons, postfix's default of alias_database for FreeBSD
+    # is `/etc/aliases'. however, it has been a symlink to /etc/mail/aliases.
+    # this usually works because human does not care of exact path. the role
+    # does. it is about time use the real path instead.
+    postfix_main_cf_freebsd:
+      alias_database: /etc/mail/aliases
 
     # unlike other distributions, the OpenBSD package does not modify
     # /etc/postfix/main.cf.default, but sets distribution defaults in

@@ -2,6 +2,8 @@
   roles:
     - ansible-role-postfix
   vars:
+    postfix_aliases:
+      dave.null: root
     postfix_tables:
       - name: mynetworks.cidr
         type: cidr
@@ -14,7 +16,14 @@
         table:
           localhost: reject
           localhost.localdomain: reject
-    postfix_main_cf: "{% if ansible_os_family == 'OpenBSD' %}{{ postfix_main_cf_openbsd }}{% else %}{}{% endif %}"
+    postfix_main_cf: "{% if ansible_os_family == 'OpenBSD' %}{{ postfix_main_cf_openbsd }}{% elif ansible_os_family == 'FreeBSD' %}{{ postfix_main_cf_freebsd }}{% else %}{}{% endif %}"
+
+    # for historical reasons, postfix's default of alias_database for FreeBSD
+    # is `/etc/aliases'. however, it has been a symlink to /etc/mail/aliases.
+    # this usually works because human does not care of exact path. the role
+    # does. it is about time use the real path instead.
+    postfix_main_cf_freebsd:
+      alias_database: /etc/mail/aliases
 
     # unlike other distributions, the OpenBSD package does not modify
     # /etc/postfix/main.cf.default, but sets distribution defaults in

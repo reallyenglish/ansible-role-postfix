@@ -7,3 +7,70 @@ __postfix_conf_dir: /etc/postfix
 # openbsd_pkg: Add support for "pkgname%branch" syntax. Fixes #97 #2508
 # https://github.com/ansible/ansible-modules-extras/pull/2508
 __postfix_package: postfix-3.1.1p0
+__postfix_aliases_file: /etc/mail/aliases
+__postfix_aliases_default:
+  "6.0":
+    MAILER-DAEMON: postmaster
+    postmaster: root
+    daemon: root
+    ftp-bugs: root
+    operator: root
+    uucp: root
+    www: root
+    _bgpd: /dev/null
+    _dhcp: /dev/null
+    _dpb: /dev/null
+    _dvmrpd: /dev/null
+    _eigrpd: /dev/null
+    _file: /dev/null
+    _fingerd: /dev/null
+    _ftp: /dev/null
+    _hostapd: /dev/null
+    _identd: /dev/null
+    _iked: /dev/null
+    _isakmpd: /dev/null
+    _iscsid: /dev/null
+    _ldapd: /dev/null
+    _ldpd: /dev/null
+    _mopd: /dev/null
+    _nsd: /dev/null
+    _ntp: /dev/null
+    _ospfd: /dev/null
+    _ospf6d: /dev/null
+    _pbuild: /dev/null
+    _pfetch: /dev/null
+    _pflogd: /dev/null
+    _pkgfetch: /dev/null
+    _pkguntar: /dev/null
+    _portmap: /dev/null
+    _ppp: /dev/null
+    _radiusd: /dev/null
+    _rbootd: /dev/null
+    _relayd: /dev/null
+    _rebound: /dev/null
+    _ripd: /dev/null
+    _rstatd: /dev/null
+    _rtadvd: /dev/null
+    _rusersd: /dev/null
+    _rwalld: /dev/null
+    _smtpd: /dev/null
+    _smtpq: /dev/null
+    _sndio: /dev/null
+    _snmpd: /dev/null
+    _spamd: /dev/null
+    _syslogd: /dev/null
+    _tcpdump: /dev/null
+    _tftpd: /dev/null
+    _unbound: /dev/null
+    _vmd: /dev/null
+    _x11: /dev/null
+    _ypldap: /dev/null
+    bin: /dev/null
+    nobody: /dev/null
+    proxy: /dev/null
+    _tftp_proxy: /dev/null
+    _ftp_proxy: /dev/null
+    _sndiop: /dev/null
+    sshd: /dev/null
+    abuse: root
+    security: root

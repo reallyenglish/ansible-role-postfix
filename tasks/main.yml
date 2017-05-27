@@ -19,7 +19,7 @@
 # empty dict if user has opted to by setting postfix_aliases_default_is_empty.
 #
 - block:
-  # block for all, except OpenBSD and RedHat
+  # block for Debian
   - name: ansible_distribution_version must be defined
     assert:
       that:
@@ -40,8 +40,7 @@
       postfix_aliases_default_created: "{{ postfix_aliases_default[ansible_distribution_version] }}"
   when:
     - not postfix_aliases_default_is_empty
-    - ansible_os_family != 'OpenBSD'
-    - ansible_os_family != 'RedHat'
+    - ansible_os_family == 'Debian'
 
 - block:
   # block for OpenBSD
@@ -66,6 +65,20 @@
   when:
     - not postfix_aliases_default_is_empty
     - ansible_os_family == 'RedHat'
+
+- block:
+  # block for FreeBSD
+  # XXX ansible_distribution_version is broken in ansible 2.1.0.0
+  - name: Get FreeBSD version
+    shell: "uname -r | cut -f 1 -d '-'"
+    register: register_postfix_freebsd_version
+    changed_when: false
+
+  - set_fact:
+      postfix_aliases_default_created: "{{ postfix_aliases_default[register_postfix_freebsd_version.stdout | quote] }}"
+  when:
+    - not postfix_aliases_default_is_empty
+    - ansible_os_family == 'FreeBSD'
 
 - name: Set empty default aliases if the user has opted to
   set_fact:

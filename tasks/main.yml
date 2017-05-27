@@ -26,6 +26,9 @@
         - ansible_distribution_version is defined
       msg: ansible_distribution_version is not defined
 
+  - debug:
+      var: ansible_distribution_version
+
   - name: postfix_aliases_default[ansible_distribution_version] must be defined
     assert:
       that:

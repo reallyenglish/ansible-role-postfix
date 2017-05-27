@@ -2,10 +2,13 @@
 
 Configures postfix.
 
+## Notes about `aliases(5)`
+
 Please make sure your platform and its version is supported in `meta/main.yml`.
 The role is designed to be version-agnostic, but, to keep compatibility with
 default installation, it maintains a list of aliases in default `aliases(5)`
-(see `var/*.yml`).
+(see `var/*.yml`). If you do not care of the system default `aliases(5)`, you
+may change this behaviour (see `postfix_aliases_default_is_empty`).
 
 ## Notes about validating configurations
 
@@ -16,7 +19,7 @@ and table periodically, it is not possible to validate them without affecting
 running postfix. If the validation fails, the ansible play will stop. But do
 not assume that your changes have not been deployed.
 
-## Notes for FreeBSD
+## Notes for FreeBSD users
 
 Always set `alias_database` to the *real* path to `aliases(5)` in `main.cf(5)`.
 Do not rely on symlinks. The role assume the path is `/etc/mail/aliases` by
@@ -46,6 +49,7 @@ None
 | `postfix_tables` | See below | `[]` |
 | `postfix_aliases` | dict of additional aliases | `{}` |
 | `postfix_aliases_default` | dict of default aliases | `{{ __postfix_aliases_default }}` |
+| `postfix_aliases_default_is_empty` | set `true` value if you do not use system's default `aliases(5)`, and create one from scratch. `postfix_aliases_default` will be ignored | `false` |
 
 ## `postfix_master_cf`
 

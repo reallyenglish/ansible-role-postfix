@@ -42,3 +42,4 @@ postfix_main_cf: {}
 postfix_tables: []
 postfix_aliases: {}
 postfix_aliases_default: "{{ __postfix_aliases_default }}"
+postfix_aliases_default_is_empty: false

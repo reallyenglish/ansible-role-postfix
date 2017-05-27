@@ -12,12 +12,14 @@
 - set_fact:
     postfix_main_cf_merged: "{{ postfix_main_cf_default | combine(postfix_main_cf, recursive = True) }}"
 
-- assert:
-    that:
-      - postfix_aliases is defined
-    msg: postfix_aliases must be defined
-
+# build postfix_aliases_default_created.
+#
+# postfix_aliases_default_created is a dict contains default aliases. it is
+# either a dict of aliases from system default (postfix_aliases_default), or
+# empty dict if user has opted to by setting postfix_aliases_default_is_empty.
+#
 - block:
+  # block for all, except OpenBSD and RedHat
   - name: ansible_distribution_version must be defined
     assert:
       that:
@@ -30,13 +32,16 @@
         - postfix_aliases_default[ansible_distribution_version] is defined
       msg: postfix_aliases_default[ansible_distribution_version] is not defined. make sure the role supports your platform and its version.
 
-  - set_fact:
-      postfix_aliases_merged: "{{ postfix_aliases_default[ansible_distribution_version] | combine(postfix_aliases) }}"
+  - name: Set aliases from the system default (common)
+    set_fact:
+      postfix_aliases_default_created: "{{ postfix_aliases_default[ansible_distribution_version] }}"
   when:
+    - not postfix_aliases_default_is_empty
     - ansible_os_family != 'OpenBSD'
     - ansible_os_family != 'RedHat'
 
 - block:
+  # block for OpenBSD
   - name: postfix_aliases_default[ansible_distribution_release] must be defined
     assert:
       that:
@@ -46,21 +51,40 @@
   - set_fact:
     # XXX this is a bug in ansible, which says ansible_distribution_version ==
     # "release" while ansible_distribution_release == "6.0"
-      postfix_aliases_merged: "{{ postfix_aliases_default[ansible_distribution_release] | combine(postfix_aliases) }}"
+      postfix_aliases_default_created: "{{ postfix_aliases_default[ansible_distribution_release] }}"
   when:
+    - not postfix_aliases_default_is_empty
     - ansible_os_family == 'OpenBSD'
 
 - block:
-  - name: postfix_aliases_default[ansible_distribution_major_version] must be defined
-    assert:
-      that:
-        - postfix_aliases_default[ansible_distribution_major_version] is defined
-      msg: postfix_aliases_default[ansible_distribution_major_version] is not defined. make sure the role supports your platform and its version.
-
+  # block for RedHat
   - set_fact:
-      postfix_aliases_merged: "{{ postfix_aliases_default[ansible_distribution_major_version] | combine(postfix_aliases) }}"
+      postfix_aliases_default_created: "{{ postfix_aliases_default[ansible_distribution_major_version] }}"
   when:
+    - not postfix_aliases_default_is_empty
     - ansible_os_family == 'RedHat'
+
+- name: Set empty default aliases if the user has opted to
+  set_fact:
+    postfix_aliases_default_created: {}
+  when:
+    - postfix_aliases_default_is_empty
+
+- name: postfix_aliases must be defined
+  assert:
+    that:
+      - postfix_aliases is defined
+    msg: postfix_aliases must be defined and a dict
+
+- name: postfix_aliases_default_created must be defined
+  assert:
+    that:
+      - postfix_aliases_default_created is defined
+    msg: "[BUG] postfix_aliases_default_created is not defined"
+
+# then, merge the created default aliases and user-defined aliases
+- set_fact:
+    postfix_aliases_merged: "{{ postfix_aliases_default_created | combine(postfix_aliases) }}"
 
 - include: "install-{{ ansible_os_family }}.yml"
 

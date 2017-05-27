@@ -48,13 +48,13 @@ when "freebsd"
   describe command("diff /etc/mail/mailer.conf /usr/local/share/postfix/mailer.conf.postfix") do
     its(:exit_status) { should eq 0 }
     its(:stdout) { should match(/^$/) }
-    its(:stderr) { should match(/^$/) }
+    its(:stderr) { should eq "" }
   end
 
   describe command("sysrc -n sendmail_enable") do
     its(:exit_status) { should eq 0 }
     its(:stdout) { should match(/^NONE$/) }
-    its(:stderr) { should match(/^$/) }
+    its(:stderr) { should eq "" }
   end
 
   describe file("/etc/periodic.conf") do
@@ -135,7 +135,7 @@ end
 describe command("make -C #{db_dir} -n #{extra_make_flag}") do
   its(:exit_status) { should eq 0 }
   its(:stdout) { should match(/^(?::)?$/) } # gmake prints commands starting with "@" even when given -n
-  its(:stderr) { should match(/^$/) }
+  its(:stderr) { should eq "" }
 end
 
 # case os[:family]
@@ -184,5 +184,5 @@ end
 describe command("postmap -q localhost #{db_dir}/hello_access.hash") do
   its(:exit_status) { should eq 0 }
   its(:stdout) { should match(/^reject$/) }
-  its(:stderr) { should match(/^$/) }
+  its(:stderr) { should eq "" }
 end

@@ -3,24 +3,62 @@
 
 - include_vars: "{{ ansible_os_family }}.yml"
 
+- name: postfix_main_cf must be defined
+  assert:
+    that:
+      - postfix_main_cf is defined
+    msg: postfix_main_cf is not defined. it must be a dict
+
 - set_fact:
     postfix_main_cf_merged: "{{ postfix_main_cf_default | combine(postfix_main_cf, recursive = True) }}"
 
-- set_fact:
-    postfix_aliases_merged: "{{ postfix_aliases_default[ansible_distribution_version] | combine(postfix_aliases) }}"
+- assert:
+    that:
+      - postfix_aliases is defined
+    msg: postfix_aliases must be defined
+
+- block:
+  - name: ansible_distribution_version must be defined
+    assert:
+      that:
+        - ansible_distribution_version is defined
+      msg: ansible_distribution_version is not defined
+
+  - name: postfix_aliases_default[ansible_distribution_version] must be defined
+    assert:
+      that:
+        - postfix_aliases_default[ansible_distribution_version] is defined
+      msg: postfix_aliases_default[ansible_distribution_version] is not defined. make sure the role supports your platform and its version.
+
+  - set_fact:
+      postfix_aliases_merged: "{{ postfix_aliases_default[ansible_distribution_version] | combine(postfix_aliases) }}"
   when:
     - ansible_os_family != 'OpenBSD'
     - ansible_os_family != 'RedHat'
 
-- set_fact:
-  # XXX this is a bug in ansible, which says ansible_distribution_version ==
-  # "release" while ansible_distribution_release == "6.0"
-    postfix_aliases_merged: "{{ postfix_aliases_default[ansible_distribution_release] | combine(postfix_aliases) }}"
+- block:
+  - name: postfix_aliases_default[ansible_distribution_release] must be defined
+    assert:
+      that:
+        - postfix_aliases_default[ansible_distribution_release] is defined
+      msg: postfix_aliases_default[ansible_distribution_release] is not defined. make sure the role supports your platform and its version.
+
+  - set_fact:
+    # XXX this is a bug in ansible, which says ansible_distribution_version ==
+    # "release" while ansible_distribution_release == "6.0"
+      postfix_aliases_merged: "{{ postfix_aliases_default[ansible_distribution_release] | combine(postfix_aliases) }}"
   when:
     - ansible_os_family == 'OpenBSD'
 
-- set_fact:
-    postfix_aliases_merged: "{{ postfix_aliases_default[ansible_distribution_major_version] | combine(postfix_aliases) }}"
+- block:
+  - name: postfix_aliases_default[ansible_distribution_major_version] must be defined
+    assert:
+      that:
+        - postfix_aliases_default[ansible_distribution_major_version] is defined
+      msg: postfix_aliases_default[ansible_distribution_major_version] is not defined. make sure the role supports your platform and its version.
+
+  - set_fact:
+      postfix_aliases_merged: "{{ postfix_aliases_default[ansible_distribution_major_version] | combine(postfix_aliases) }}"
   when:
     - ansible_os_family == 'RedHat'
 

@@ -1,0 +1,52 @@
+- hosts: localhost
+  roles:
+    - ansible-role-postfix
+  vars:
+    postfix_aliases_default_is_empty: true
+    postfix_aliases:
+      dave.null: root
+    postfix_tables:
+      - name: mynetworks.cidr
+        type: cidr
+        table:
+          127.0.0.1:
+          192.168.100.0/24:
+          192.168.101.0/24:
+      - name: hello_access.hash
+        type: hash
+        table:
+          localhost: reject
+          localhost.localdomain: reject
+    postfix_main_cf: "{% if ansible_os_family == 'OpenBSD' %}{{ postfix_main_cf_openbsd }}{% elif ansible_os_family == 'FreeBSD' %}{{ postfix_main_cf_freebsd }}{% else %}{}{% endif %}"
+
+    # for historical reasons, postfix's default of alias_database for FreeBSD
+    # is `/etc/aliases'. however, it has been a symlink to /etc/mail/aliases.
+    # this usually works because human does not care of exact path. the role
+    # does. it is about time use the real path instead.
+    postfix_main_cf_freebsd:
+      alias_database: /etc/mail/aliases
+
+    # unlike other distributions, the OpenBSD package does not modify
+    # /etc/postfix/main.cf.default, but sets distribution defaults in
+    # /etc/postfix/main.cf. An empty main.cf does not work.
+    postfix_main_cf_openbsd:
+      compatibility_level: 2
+      smtputf8_enable: "no"
+      queue_directory: /var/spool/postfix
+      command_directory: /usr/local/sbin
+      daemon_directory: /usr/local/libexec/postfix
+      data_directory: /var/postfix
+      mail_owner: "{{ postfix_user }}"
+      inet_protocols: all
+      unknown_local_recipient_reject_code: 550
+      debug_peer_level: 2
+      sendmail_path: /usr/local/sbin/sendmail
+      newaliases_path: /usr/local/sbin/newaliases
+      mailq_path: /usr/local/sbin/mailq
+      setgid_group: _postdrop
+      html_directory: /usr/local/share/doc/postfix/html
+      manpage_directory: /usr/local/man
+      sample_directory: /etc/postfix
+      readme_directory: /usr/local/share/doc/postfix/readme
+      meta_directory: /etc/postfix
+      shlib_directory: "no"

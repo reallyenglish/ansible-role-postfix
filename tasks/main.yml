@@ -3,8 +3,104 @@
 
 - include_vars: "{{ ansible_os_family }}.yml"
 
+- name: postfix_main_cf must be defined
+  assert:
+    that:
+      - postfix_main_cf is defined
+    msg: postfix_main_cf is not defined. it must be a dict
+
 - set_fact:
     postfix_main_cf_merged: "{{ postfix_main_cf_default | combine(postfix_main_cf, recursive = True) }}"
+
+# build postfix_aliases_default_created.
+#
+# postfix_aliases_default_created is a dict contains default aliases. it is
+# either a dict of aliases from system default (postfix_aliases_default), or
+# empty dict if user has opted to by setting postfix_aliases_default_is_empty.
+#
+- block:
+  # block for Debian
+  - name: ansible_distribution_version must be defined
+    assert:
+      that:
+        - ansible_distribution_version is defined
+      msg: ansible_distribution_version is not defined
+
+  - debug:
+      var: ansible_distribution_version
+
+  - name: postfix_aliases_default[ansible_distribution_version] must be defined
+    assert:
+      that:
+        - postfix_aliases_default[ansible_distribution_version] is defined
+      msg: postfix_aliases_default[ansible_distribution_version] is not defined. make sure the role supports your platform and its version.
+
+  - name: Set aliases from the system default (common)
+    set_fact:
+      postfix_aliases_default_created: "{{ postfix_aliases_default[ansible_distribution_version] }}"
+  when:
+    - not postfix_aliases_default_is_empty
+    - ansible_os_family == 'Debian'
+
+- block:
+  # block for OpenBSD
+  - name: postfix_aliases_default[ansible_distribution_release] must be defined
+    assert:
+      that:
+        - postfix_aliases_default[ansible_distribution_release] is defined
+      msg: postfix_aliases_default[ansible_distribution_release] is not defined. make sure the role supports your platform and its version.
+
+  - set_fact:
+    # XXX this is a bug in ansible, which says ansible_distribution_version ==
+    # "release" while ansible_distribution_release == "6.0"
+      postfix_aliases_default_created: "{{ postfix_aliases_default[ansible_distribution_release] }}"
+  when:
+    - not postfix_aliases_default_is_empty
+    - ansible_os_family == 'OpenBSD'
+
+- block:
+  # block for RedHat
+  - set_fact:
+      postfix_aliases_default_created: "{{ postfix_aliases_default[ansible_distribution_major_version] }}"
+  when:
+    - not postfix_aliases_default_is_empty
+    - ansible_os_family == 'RedHat'
+
+- block:
+  # block for FreeBSD
+  # XXX ansible_distribution_version is broken in ansible 2.1.0.0
+  - name: Get FreeBSD version
+    shell: "uname -r | cut -f 1 -d '-'"
+    register: register_postfix_freebsd_version
+    changed_when: false
+
+  - set_fact:
+      postfix_aliases_default_created: "{{ postfix_aliases_default[register_postfix_freebsd_version.stdout | quote] }}"
+  when:
+    - not postfix_aliases_default_is_empty
+    - ansible_os_family == 'FreeBSD'
+
+- name: Set empty default aliases if the user has opted to
+  set_fact:
+    postfix_aliases_default_created: {}
+  when:
+    - postfix_aliases_default_is_empty
+
+- name: postfix_aliases must be defined
+  assert:
+    that:
+      - postfix_aliases is defined
+    msg: postfix_aliases must be defined and a dict
+
+- name: postfix_aliases_default_created must be defined
+  assert:
+    that:
+      - postfix_aliases_default_created is defined
+    msg: "[BUG] postfix_aliases_default_created is not defined"
+
+# then, merge the created default aliases and user-defined aliases
+- set_fact:
+    postfix_aliases_merged: "{{ postfix_aliases_default_created | combine(postfix_aliases) }}"
 
 - include: "install-{{ ansible_os_family }}.yml"
 
@@ -25,6 +121,30 @@
     src: main.cf.j2
     dest: "{{ postfix_main_cf_path }}"
   notify: Reload postfix
+
+- name: Create aliases(5)
+  template:
+    src: aliases.j2
+    dest: "{{ postfix_aliases_file }}"
+    backup: yes
+  register: register_postfix_aliases_file
+
+- name: Stat aliases(5)
+  stat:
+    path: "{{ postfix_aliases_file }}"
+  register: register_postfix_aliases_file_st
+
+- name: Stat aliases.db
+  stat:
+    path: "{{ postfix_aliases_file }}.db"
+  register: register_postfix_aliases_db_st
+
+- name: Update aliases(5)
+  command: newaliases
+  when:
+    # translation: update aliases.db does not exist or aliases is newer than
+    # aliases.db
+    - register_postfix_aliases_db_st.stat.exists == false or (register_postfix_aliases_file_st.stat.mtime > register_postfix_aliases_db_st.stat.mtime)
 
 - name: Register alias_maps
   shell: "postconf -pxh alias_maps | cut -f 2 -d:"

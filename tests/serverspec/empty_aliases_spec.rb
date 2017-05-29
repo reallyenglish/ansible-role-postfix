@@ -81,14 +81,14 @@ describe file(aliases_file) do
   it { should be_mode 644 }
   its(:content) { should match(/^dave\.null:\s+root$/) }
   aliases_default_hash.each do |k, v|
-    its(:content) { should match(/^#{Regexp.escape(k)}:\s+#{Regexp.escape(v)}$/) }
+    its(:content) { should_not match(/^#{Regexp.escape(k)}:\s+#{Regexp.escape(v)}$/) }
   end
 end
 
 aliases_default_hash.each do |k, v|
   describe command("postmap -q #{k} #{aliases_file}") do
-    its(:exit_status) { should eq 0 }
-    its(:stdout) { should match(/^#{Regexp.escape(v)}$/) }
+    its(:exit_status) { should eq 1 }
+    its(:stdout) { should_not match(/^#{Regexp.escape(v)}$/) }
     its(:stderr) { should eq "" }
   end
 end

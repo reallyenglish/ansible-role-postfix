@@ -2,3 +2,35 @@ __postfix_user: postfix
 __postfix_group: postfix
 __postfix_conf_dir: /usr/local/etc/postfix
 __postfix_package: mail/postfix
+__postfix_aliases_file: /etc/mail/aliases
+__postfix_aliases_default:
+  "10.3":
+    MAILER-DAEMON: postmaster
+    postmaster: root
+    _dhcp: root
+    _pflogd: root
+    auditdistd: root
+    bin: root
+    bind: root
+    daemon: root
+    games: root
+    hast: root
+    kmem: root
+    mailnull: postmaster
+    man: root
+    news: root
+    nobody: root
+    operator: root
+    pop: root
+    proxy: root
+    smmsp: postmaster
+    sshd: root
+    system: root
+    toor: root
+    tty: root
+    usenet: news
+    uucp: root
+    abuse: root
+    security: root
+    ftp: root
+    ftp-bugs: ftp

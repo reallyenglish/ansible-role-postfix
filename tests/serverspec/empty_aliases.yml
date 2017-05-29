@@ -2,6 +2,7 @@
   roles:
     - ansible-role-postfix
   vars:
+    postfix_aliases_default_is_empty: true
     postfix_aliases:
       dave.null: root
     postfix_tables:

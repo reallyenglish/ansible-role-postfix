@@ -26,9 +26,6 @@
         - ansible_distribution_version is defined
       msg: ansible_distribution_version is not defined
 
-  - debug:
-      var: ansible_distribution_version
-
   - name: postfix_aliases_default[ansible_distribution_version] must be defined
     assert:
       that:
@@ -151,35 +148,11 @@
   register: register_alias_maps
   changed_when: false
 
-- name: See if the platform's make is gmake
-  command: make --version
-  register: register_make_version
-  failed_when: false
-  changed_when: false
-
-- name: Set postfix_make_is_gmake to true if make is gmake
-  set_fact:
-    postfix_make_is_gmake: "{% if register_make_version.rc == 0 and register_make_version.stdout | search('GNU Make') %}True{% else %}False{% endif %}"
-
-- name: Create BSD Makefile to postmap databases
-  template:
-    src: Makefile.bsd.j2
-    dest: "{{ postfix_db_dir }}/Makefile"
-    validate: make -f %s -n
-  when: not postfix_make_is_gmake
-
-- name: Create GNU Makefile to postmap databases
-  template:
-    src: Makefile.gmake.j2
-    dest: "{{ postfix_db_dir }}/Makefile"
-    validate: make -f %s -n
-  when: postfix_make_is_gmake
-
 - name: Create lookup table files
   template:
     src: table.j2
     dest: "{{ postfix_db_dir }}/{{ item.name }}"
-  register: register_table
+  register: register_postfix_create_lookup_table
   # TODO create a wrapper script to validate file-based database files
   # validate: postmap_validate -t {{ item.value.type }} %s
   with_items: "{{ postfix_tables  }}"
@@ -189,15 +162,16 @@
     # extract file name that needs to be postmap(8)ed from `postfix_tables`
     postfix_text_databases: "{{ postfix_tables | selectattr('type', 'match', '^(btree|cdb|dbm|hash|lmdb|sdbm)$') | map(attribute='name') | list }}"
 
-- name: Run postmap(1) on changed files by Makefile
-  # set --no-print-directory when make is gmake.
-  #
-  # gmake prints "Entering/Leaving directory ..." even when there is nothing to
-  # do
-  shell: "make -C {{ postfix_db_dir }} {% if postfix_make_is_gmake %}--no-print-directory {% endif %}HASHES='{{ postfix_text_databases | join(' ')  }}'"
-  register: register_make_postmap
-  changed_when: register_make_postmap.stdout | length > 0
-  notify: Reload postfix
+- name: Run postmap(1) on changed text databases
+  command: "postmap {{ item.item.type }}:{{ item.invocation.module_args.dest }}"
+  with_items: "{{ register_postfix_create_lookup_table.results }}"
+  # translation: run postmap when the table is one of text-based database, and
+  # the table has changed or its database file does not exist
+  when:
+    - item.item.name in postfix_text_databases
+    # for a reason I do not know, "not (var + 'string' | exists)" does not work
+    # here
+    - "item.changed or not [item.invocation.module_args.dest, 'db'] | join('.') | exists"
 
 - name: Validate all configurations
   command: postfix check

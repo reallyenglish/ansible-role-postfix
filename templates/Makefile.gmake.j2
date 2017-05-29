@@ -1,8 +1,0 @@
-HASHES_DB = $(HASHES:=.db)
-all : $(HASHES_DB)
-	@:
-
-$(HASHES_DB): $*
-	postmap $(subst .,,$(suffix $*)):$*
-
-.SUFFIXES: .db

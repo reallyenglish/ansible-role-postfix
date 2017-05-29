@@ -124,20 +124,6 @@ describe file(db_dir) do
   it { should be_mode 755 }
 end
 
-describe file("#{db_dir}/Makefile") do
-  it { should exist }
-  it { should be_file }
-  it { should be_owned_by default_user }
-  it { should be_mode 644 }
-  it { should be_grouped_into default_group }
-end
-
-describe command("make -C #{db_dir} -n #{extra_make_flag}") do
-  its(:exit_status) { should eq 0 }
-  its(:stdout) { should match(/^(?::)?$/) } # gmake prints commands starting with "@" even when given -n
-  its(:stderr) { should eq "" }
-end
-
 # case os[:family]
 # when "freebsd"
 #   describe file("/etc/rc.conf.d/postfix") do

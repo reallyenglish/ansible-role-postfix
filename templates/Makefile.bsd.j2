@@ -1,7 +1,0 @@
-HASHES_DB=	${HASHES:=.db}
-all:	${HASHES_DB}
-
-${HASHES_DB}: ${.PREFIX}
-	postmap ${.PREFIX:C/^.*\.//}:${.PREFIX}
-
-.SUFFIXES: .db

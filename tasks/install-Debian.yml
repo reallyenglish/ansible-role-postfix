@@ -7,11 +7,6 @@
     value: No configuration
     vtype: select
 
-- name: Install gmake
-  apt:
-    name: make
-    state: present
-
 - name: Install postfix
   apt:
     name: "{{ postfix_package }}"

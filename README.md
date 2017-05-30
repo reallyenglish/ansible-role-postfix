@@ -43,6 +43,7 @@ None
 | `postfix_main_cf_path` | path to `main.cf` | `{{ __postfix_conf_dir }}/main.cf` |
 | `postfix_flags` | NOT implemented | `""` |
 | `postfix_package` | package name of postfix | `{{ __postfix_package }}` |
+| `postfix_extra_package` | list of extra packages to install, such as `postfix-cdb`. you may install any packages using the variable, but the role does nothing more than installing them. | `[]` |
 | `postfix_master_cf` | array of lines of `master.cf` | See below |
 | `postfix_main_cf_default` | dict of defaults in `main.cf` | `{"soft_bounce"=>"yes"}` |
 | `postfix_main_cf` | dict of `main.cf` | `{}` |
@@ -412,6 +413,7 @@ None
       readme_directory: /usr/local/share/doc/postfix/readme
       meta_directory: /etc/postfix
       shlib_directory: "no"
+    postfix_extra_package: [ "pflogsumm" ]
 ```
 
 # License

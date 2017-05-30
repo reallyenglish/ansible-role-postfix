@@ -9,6 +9,7 @@ aliases_file = "/etc/aliases"
 aliases_default_hash = { "postmaster" => "root" }
 default_user = "root"
 default_group = "root"
+extra_package = [ "pflogsumm" ]
 
 case os[:family]
 when "freebsd"
@@ -31,6 +32,12 @@ master_cf = "#{conf_dir}/master.cf"
 
 describe package(package) do
   it { should be_installed }
+end
+
+extra_package.each do |p|
+  describe package(p) do
+    it { should be_installed }
+  end
 end
 
 case os[:family]

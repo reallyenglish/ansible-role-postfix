@@ -5,6 +5,13 @@
     name: "{{ postfix_package }}"
     state: present
 
+- name: Install postfix_extra_package
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ postfix_extra_package }}"
+
+
 - name: Enable postfix
   service:
     name: "{{ postfix_service }}"

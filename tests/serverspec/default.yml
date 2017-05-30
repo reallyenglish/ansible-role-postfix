@@ -49,3 +49,4 @@
       readme_directory: /usr/local/share/doc/postfix/readme
       meta_directory: /etc/postfix
       shlib_directory: "no"
+    postfix_extra_package: [ "pflogsumm" ]

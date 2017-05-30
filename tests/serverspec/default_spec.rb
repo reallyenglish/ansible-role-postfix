@@ -9,7 +9,7 @@ aliases_file = "/etc/aliases"
 aliases_default_hash = { "postmaster" => "root" }
 default_user = "root"
 default_group = "root"
-extra_package = [ "pflogsumm" ]
+extra_package = ["pflogsumm"]
 
 case os[:family]
 when "freebsd"

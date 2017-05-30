@@ -5,7 +5,6 @@ package = "postfix"
 service = "postfix"
 conf_dir = "/etc/postfix"
 ports = [25]
-extra_make_flag = "--no-print-directory"
 aliases_file = "/etc/aliases"
 aliases_default_hash = { "postmaster" => "root" }
 default_user = "root"
@@ -14,13 +13,11 @@ default_group = "root"
 case os[:family]
 when "freebsd"
   conf_dir = "/usr/local/etc/postfix"
-  extra_make_flag = ""
   default_group = "wheel"
   aliases_file = "/etc/mail/aliases"
   aliases_default_hash = { "MAILER-DAEMON" => "postmaster", "_dhcp" => "root",
                            "auditdistd" => "root", "hast" => "root" }
 when "openbsd"
-  extra_make_flag = ""
   default_group = "wheel"
   aliases_file = "/etc/mail/aliases"
   aliases_default_hash = { "MAILER-DAEMON" => "postmaster", "_dhcp" => "/dev/null", "_bgpd" => "/dev/null" }
@@ -130,12 +127,6 @@ describe file("#{db_dir}/Makefile") do
   it { should be_owned_by default_user }
   it { should be_mode 644 }
   it { should be_grouped_into default_group }
-end
-
-describe command("make -C #{db_dir} -n #{extra_make_flag}") do
-  its(:exit_status) { should eq 0 }
-  its(:stdout) { should match(/^(?::)?$/) } # gmake prints commands starting with "@" even when given -n
-  its(:stderr) { should eq "" }
 end
 
 # case os[:family]

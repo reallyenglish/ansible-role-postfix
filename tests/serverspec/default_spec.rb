@@ -5,7 +5,6 @@ package = "postfix"
 service = "postfix"
 conf_dir = "/etc/postfix"
 ports = [25]
-extra_make_flag = "--no-print-directory"
 aliases_file = "/etc/aliases"
 aliases_default_hash = { "postmaster" => "root" }
 default_user = "root"
@@ -14,13 +13,11 @@ default_group = "root"
 case os[:family]
 when "freebsd"
   conf_dir = "/usr/local/etc/postfix"
-  extra_make_flag = ""
   default_group = "wheel"
   aliases_file = "/etc/mail/aliases"
   aliases_default_hash = { "MAILER-DAEMON" => "postmaster", "_dhcp" => "root",
                            "auditdistd" => "root", "hast" => "root" }
 when "openbsd"
-  extra_make_flag = ""
   default_group = "wheel"
   aliases_file = "/etc/mail/aliases"
   aliases_default_hash = { "MAILER-DAEMON" => "postmaster", "_dhcp" => "/dev/null", "_bgpd" => "/dev/null" }

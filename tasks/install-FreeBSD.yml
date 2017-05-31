@@ -5,6 +5,12 @@
     name: "{{ postfix_package }}"
     state: present
 
+- name: Install postfix_extra_packages
+  pkgng:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ postfix_extra_packages }}"
+
 - name: See if mailer.conf is updated
   command: diff /etc/mail/mailer.conf /usr/local/share/postfix/mailer.conf.postfix
   register: register_diff_mailer_conf

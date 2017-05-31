@@ -171,7 +171,7 @@
     - item.item.name in postfix_text_databases
     # for a reason I do not know, "not (var + 'string' | exists)" does not work
     # here
-    - "item.changed or not [item.invocation.module_args.dest, 'db'] | join('.') | exists"
+    - "item.changed or not ( [item.invocation.module_args.dest, 'db'] | join('.') | exists )"
 
 - name: Validate all configurations
   command: postfix check

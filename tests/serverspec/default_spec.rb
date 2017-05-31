@@ -24,6 +24,7 @@ when "openbsd"
   aliases_default_hash = { "MAILER-DAEMON" => "postmaster", "_dhcp" => "/dev/null", "_bgpd" => "/dev/null" }
 when "redhat"
   aliases_default_hash = { "mailer-daemon" => "postmaster", "ftpadmin" => "ftp", "ftp-adm" => "ftp", "marketing" => "postmaster" }
+  extra_package = ["postfix-perl-scripts"]
 end
 
 db_dir = "#{conf_dir}/db"

@@ -1,3 +1,10 @@
+## Release 1.1.0
+
+* b12d233 [feature] introduce postfix_extra_packages (#29)
+* 2e27fe2 [bugfix] Remove Makefile (#28)
+* ac21540 [bugfix] manage aliases(5) (#27)
+* 65f2ed6 [bugfix] QA (#24)
+
 ## Release 1.0.1
 
 * 470525d [bugfix] install make (#21)

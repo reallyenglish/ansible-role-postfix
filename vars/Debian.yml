@@ -10,3 +10,19 @@ __postfix_aliases_default:
     postmaster: root
   "16.04":
     postmaster: root
+  
+  # Debian provides different aliases then Ubuntu
+  "9.0":
+    mailer-daemon: postmaster
+    postmaster: root
+    nobody: root
+    hostmaster: root
+    usenet: root
+    news: root
+    webmaster: root
+    www: root
+    ftp: root
+    abuse: root
+    noc: root
+    security: root
+

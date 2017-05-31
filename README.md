@@ -413,7 +413,7 @@ None
       readme_directory: /usr/local/share/doc/postfix/readme
       meta_directory: /etc/postfix
       shlib_directory: "no"
-    postfix_extra_package: [ "pflogsumm" ]
+    postfix_extra_package: "{% if ansible_os_family == 'RedHat' %}[ 'postfix-perl-scripts' ]{% else %}[ 'pflogsumm' ]{% endif %}"
 ```
 
 # License

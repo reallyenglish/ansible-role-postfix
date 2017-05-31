@@ -6,7 +6,7 @@ __postfix_aliases_file: /etc/aliases
 __postfix_aliases_default:
   # interestingly, ubuntu does not provide aliases for system users, such as
   # `www`, but just `postmaster`. if that is their policy, respect it
-  "14.04":
+  "14":
     postmaster: root
-  "16.04":
+  "16":
     postmaster: root

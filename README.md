@@ -127,7 +127,7 @@ postfix_tables:
 
 ```yaml
 __postfix_aliases_default:
-  "8.6":
+  "8":
     postmaster: root
 ```
 
@@ -368,9 +368,9 @@ __postfix_aliases_default:
 
 ```yaml
 __postfix_aliases_default:
-  "14.04":
+  "14":
     postmaster: root
-  "16.04":
+  "16":
     postmaster: root
 ```
 

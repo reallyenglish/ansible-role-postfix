@@ -6,5 +6,5 @@ __postfix_aliases_file: /etc/aliases
 __postfix_aliases_default:
   # interestingly, debian does not provide aliases for system users, such as
   # `www`, but just `postmaster`. if that is their policy, respect it
-  "8.6":
+  "8":
     postmaster: root

@@ -5,11 +5,11 @@
     name: "{{ postfix_package }}"
     state: present
 
-- name: Install postfix_extra_package
+- name: Install postfix_extra_packages
   openbsd_pkg:
     name: "{{ item }}"
     state: present
-  with_items: "{{ postfix_extra_package }}"
+  with_items: "{{ postfix_extra_packages }}"
 
 - name: Create /etc/mailer.conf
   command: /usr/local/sbin/postfix-enable

@@ -8,3 +8,8 @@ __postfix_aliases_default:
   # `www`, but just `postmaster`. if that is their policy, respect it
   "8":
     postmaster: root
+  
+  # Debian provides different aliases then Ubuntu
+  "9.0":
+    postmaster: root
+

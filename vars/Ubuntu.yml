@@ -4,12 +4,9 @@ __postfix_conf_dir: /etc/postfix
 __postfix_package: postfix
 __postfix_aliases_file: /etc/aliases
 __postfix_aliases_default:
-  # interestingly, debian does not provide aliases for system users, such as
+  # interestingly, ubuntu does not provide aliases for system users, such as
   # `www`, but just `postmaster`. if that is their policy, respect it
-  "8":
+  "14":
     postmaster: root
-  
-  # Debian provides different aliases then Ubuntu
-  "9.0":
+  "16":
     postmaster: root
-

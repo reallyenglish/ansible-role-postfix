@@ -1,3 +1,7 @@
+## Release 1.2.0
+
+* ae792ab [feature] support Debian 8.6 (#32)
+
 ## Release 1.1.0
 
 * b12d233 [feature] introduce postfix_extra_packages (#29)

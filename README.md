@@ -127,9 +127,7 @@ postfix_tables:
 
 ```yaml
 __postfix_aliases_default:
-  "14.04":
-    postmaster: root
-  "16.04":
+  "8":
     postmaster: root
 ```
 
@@ -353,6 +351,27 @@ __postfix_aliases_default:
     sales: postmaster
     support: postmaster
     decode: root
+```
+
+## Ubuntu
+
+| Variable | Default |
+|----------|---------|
+| `__postfix_user` | `postfix` |
+| `__postfix_group` | `postfix` |
+| `__postfix_conf_dir` | `/etc/postfix` |
+| `__postfix_package` | `postfix` |
+| `__postfix_aliases_file` | `/etc/aliases` |
+| `__postfix_aliases_default` | see below |
+
+### `__postfix_aliases_default`
+
+```yaml
+__postfix_aliases_default:
+  "14":
+    postmaster: root
+  "16":
+    postmaster: root
 ```
 
 # Dependencies

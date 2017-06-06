@@ -8,3 +8,5 @@ __postfix_aliases_default:
   # `www`, but just `postmaster`. if that is their policy, respect it
   "8":
     postmaster: root
+  "9":
+    postmaster: root

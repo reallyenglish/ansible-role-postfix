@@ -1,3 +1,7 @@
+## Release 1.3.0
+
+* 81a9c9f [feature] use same defaults for debian 8 and 9
+
 ## Release 1.2.0
 
 * ae792ab [feature] support Debian 8.6 (#32)

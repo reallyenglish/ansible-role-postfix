@@ -22,6 +22,10 @@ galaxy_info:
   - name: Debian
     versions:
     - jessie
+    # uncomment this when `stretch` is released and the role is tested and
+    # verified with the box for the release.
+    # https://wiki.debian.org/DebianStretch
+    # - stretch
 
   galaxy_tags:
     - mail

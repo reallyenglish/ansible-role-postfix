@@ -48,7 +48,7 @@
     - ansible_os_family == 'Debian'
 
 - block:
-  # block for OpenBSD
+  # block for OpenBSD with ansible version < 2.2
   - name: postfix_aliases_default[ansible_distribution_release] must be defined
     assert:
       that:
@@ -62,6 +62,22 @@
   when:
     - not postfix_aliases_default_is_empty
     - ansible_os_family == 'OpenBSD'
+    - ansible_version.full | version_compare('2.2', '<')
+
+- block:
+  # block for OpenBSD with ansible version >= 2.2
+  - name: postfix_aliases_default[ansible_distribution_version] must be defined
+    assert:
+      that:
+        - postfix_aliases_default[ansible_distribution_version] is defined
+      msg: postfix_aliases_default[ansible_distribution_version] is not defined. make sure the role supports your platform and its version.
+
+  - set_fact:
+      postfix_aliases_default_created: "{{ postfix_aliases_default[ansible_distribution_version] }}"
+  when:
+    - not postfix_aliases_default_is_empty
+    - ansible_os_family == 'OpenBSD'
+    - ansible_version.full | version_compare('2.2', '>=')
 
 - block:
   # block for RedHat

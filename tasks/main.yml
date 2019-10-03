@@ -189,25 +189,28 @@
 - name: Run postmap(1) on changed text databases
   command: "postmap {{ item.item.type }}:{{ item.invocation.module_args.dest }}"
   with_items: "{{ register_postfix_create_lookup_table.results }}"
+  register: register_postfix_run_postmap
   # translation: run postmap when the table is one of text-based database, and
   # the table has changed or its database file does not exist
   when:
     - item.item.name in postfix_text_databases
     - item.changed
 
-- name: Check if a hash of a text-based database is missing
-  stat:
-    path: "{{ [item.path, 'db'] | join ('.') }}"
-  with_items: "{{ register_postfix_create_lookup_table.results }}"
-  register: register_postfix_text_database_stat
-  when: item.item.name in postfix_text_databases
+- block:
+  - name: Check if a hash of a text-based database is missing
+    stat:
+      path: "{{ [item.path, 'db'] | join ('.') }}"
+    with_items: "{{ register_postfix_create_lookup_table.results }}"
+    register: register_postfix_text_database_stat
+    when: item.item.name in postfix_text_databases
 
-- name: Run postmap(1) to recreate a missing hash database
-  command: "postmap {{ item.item.dest }}"
-  with_items: "{{ register_postfix_text_database_stat.results }}"
-  # translation: run postmap when the table is one of text-based database,
-  # the table hasn't changed but the hash is absent for some reason
-  when: item.item.item.name in postfix_text_databases and not item.stat.exists
+  - name: Run postmap(1) to recreate a missing hash database
+    command: "postmap {{ item.item.dest }}"
+    with_items: "{{ register_postfix_text_database_stat.results }}"
+    # translation: run postmap when the table is one of text-based database,
+    # the table hasn't changed but the hash is absent for some reason
+    when: item.item.item.name in postfix_text_databases and not item.stat.exists
+  when: not register_postfix_run_postmap.changed
 
 - name: Validate all configurations
   command: postfix check
